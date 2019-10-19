@@ -4,6 +4,9 @@ const fileUpload = require('express-fileupload');
 const route = require('./routes/upload')
 const app = express();
 
+let port = process.env.PORT || '411',
+    ip = process.env.IP || 'localhost';
+
 //const testMods = require("../mods/testMod")
 app.use(fileUpload({
   useTempFiles: true,
@@ -16,6 +19,6 @@ app.use(bodyParser.json());
 
 app.use('/',route);
 
-app.listen('411', 'localhost', function(){
+app.listen(port, ip, function(){
   console.log('Server Online!');
 })
