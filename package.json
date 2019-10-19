@@ -4,8 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start":"nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start":"node app.js"
   },
   "keywords": [],
   "author": "John Spriggs",
@@ -18,6 +17,5 @@
     "express-fileupload": "^1.1.6-alpha.5",
     "fs": "0.0.1-security",
     "line-by-line": "^0.1.6",
-    "nodemon": "^1.19.4"
   }
 }
