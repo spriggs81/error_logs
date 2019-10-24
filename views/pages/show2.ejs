@@ -46,14 +46,14 @@
                 Payload: [++++++An Array was found in payload. (More Testing Needed(1st Level))+++++++]
               <% } else { %>
                 Payload: {
-                <% let f = 0 %>
+                <% let a = 0 %>
                 <% for (const key of Object.keys(line.payload)) { %>
                   <% let val = line.payload[key] %>
                   <% if(val === null || val === ''){ %>
                       <% val = "null" %>
                   <% } %>
                   <% if(Object.is(val, String(val))===true || typeof val === 'boolean' || Object.is(val, Number(val)) === true){ %>
-                    <% if(f > 0){ %>
+                    <% if(a > 0){ %>
                       <%= ", " + key + ": " + val %>
                     <% } else { %>
                       <%= key + ": " + val %>
@@ -61,15 +61,19 @@
                   <% } else if(Array.isArray(val) === true){ %>
                     <%= key + '[++++++An Array was found in payload. (More Testing Needed(2nd Level))+++++++]' %>
                   <% } else { %>
-                    <%= key + ": {" %>
-                    <% let g = 0 %>
+                    <% if(a > 0){ %>
+                      <%= ", " + key + ": {" %>
+                    <% } else { %>
+                      <%= key + ": {" %>
+                    <% } %>
+                    <% let b = 0 %>
                     <% for (const key1 of Object.keys(line.payload[key])) { %>
                       <% let val1 = line.payload[key][key1] %>
                       <% if(val1 === null || val1 === ''){ %>
                           <% val1 = "null" %>
                       <% } %>
                       <% if(Object.is(val1, String(val1))===true || typeof val1 === 'boolean' || Object.is(val1, Number(val1)) === true){ %>
-                        <% if(g > 0){ %>
+                        <% if(b > 0){ %>
                           <%= ", " + key1 + ": " + val1 %>
                         <% } else { %>
                           <%= key1 + ": " + val1 %>
@@ -77,8 +81,8 @@
                       <% } else if(Array.isArray(val1) === true){ %>
                         ++++++An Array was found in payload. (More Testing Needed(2st Level))+++++++
                       <% } else { %>
-                        <% let h = 0 %>
-                        <% if(g > 0){ %>
+                        <% let c = 0 %>
+                        <% if(b > 0){ %>
                           <%= ", " + key1 + ": {" %>
                         <% } else { %>
                           <%= key1 + ": {" %>
@@ -88,20 +92,20 @@
                           <% if(val2 === null || val2 === ''){ %>
                               <% val2 = "null" %>
                           <% } %>
-                          <% if(h > 0){ %>
+                          <% if(c > 0){ %>
                             <%= ", " + key2 + ": " + val2 %>
                           <% } else { %>
                             <%= key2 + ": " + val2 %>
                           <% } %>
+                          <% c++ %>
                         <% } %>
                         }
-                        <% h++ %>
                       <% } %>
-                      <% g++ %>
+                      <% b++ %>
                     <% } %>
                     }
                   <% } %>
-                    <% f++ %>
+                    <% a++ %>
                   <% } %>
                   }
                 <% } %>
@@ -115,17 +119,17 @@
                   <% line.message = "null" %>
                 <% } %>
                 <% if(Array.isArray(line.message) === true){ %>
-                  message: [++++++An Array was found in message. (More Testing Needed(1st Level))+++++++]
+                  Message: [++++++An Array was found in message. (More Testing Needed(1st Level))+++++++]
                 <% } else { %>
                   Message: {
-                  <% let f = 0 %>
+                  <% let a = 0 %>
                   <% for (const key of Object.keys(line.message)) { %>
                     <% let val = line.message[key] %>
                     <% if(val === null || val === ''){ %>
                         <% val = "null" %>
                     <% } %>
                     <% if(Object.is(val, String(val))===true || typeof val === 'boolean' || Object.is(val, Number(val)) === true){ %>
-                      <% if(f > 0){ %>
+                      <% if(a > 0){ %>
                         <%= ", " + key + ": " + val %>
                       <% } else { %>
                         <%= key + ": " + val %>
@@ -133,15 +137,19 @@
                     <% } else if(Array.isArray(val) === true){ %>
                       <%= key + '[++++++An Array was found in message. (More Testing Needed(2nd Level))+++++++]' %>
                     <% } else { %>
-                      <%= key + ": {" %>
-                      <% let g = 0 %>
+                      <% if(a > 0){ %>
+                        <%= ", " + key + ": {" %>
+                      <% } else { %>
+                        <%= key + ": {" %>
+                      <% } %>
+                      <% let b = 0 %>
                       <% for (const key1 of Object.keys(line.message[key])) { %>
                         <% let val1 = line.message[key][key1] %>
                         <% if(val1 === null || val1 === ''){ %>
                             <% val1 = "null" %>
                         <% } %>
                         <% if(Object.is(val1, String(val1))===true || typeof val1 === 'boolean' || Object.is(val1, Number(val1)) === true){ %>
-                          <% if(g > 0){ %>
+                          <% if(b > 0){ %>
                             <%= ", " + key1 + ": " + val1 %>
                           <% } else { %>
                             <%= key1 + ": " + val1 %>
@@ -149,8 +157,8 @@
                         <% } else if(Array.isArray(val1) === true){ %>
                           ++++++An Array was found in payload. (More Testing Needed(2st Level))+++++++
                         <% } else { %>
-                          <% let h = 0 %>
-                          <% if(g > 0){ %>
+                          <% let c = 0 %>
+                          <% if(b > 0){ %>
                             <%= ", " + key1 + ": {" %>
                           <% } else { %>
                             <%= key1 + ": {" %>
@@ -160,20 +168,20 @@
                             <% if(val2 === null || val2 === ''){ %>
                                 <% val2 = "null" %>
                             <% } %>
-                            <% if(h > 0){ %>
+                            <% if(c > 0){ %>
                               <%= ", " + key2 + ": " + val2 %>
                             <% } else { %>
                               <%= key2 + ": " + val2 %>
                             <% } %>
+                            <% c++ %>
                           <% } %>
                           }
-                          <% h++ %>
                         <% } %>
-                        <% g++ %>
+                        <% b++ %>
                       <% } %>
                       }
                     <% } %>
-                      <% f++ %>
+                      <% a++ %>
                     <% } %>
                     }
                   <% } %>
