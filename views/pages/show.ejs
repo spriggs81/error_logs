@@ -1,4 +1,7 @@
 <% include ../partials/header %>
+    <div class="filtering">
+        <h1>Here You!</h1>
+    </div>
     <div class="tableRes">
       <table class="table table-striped table-dark">
         <thead>
@@ -25,10 +28,10 @@
             <% let ss = line.time.slice(17,19) %>
             <% let ms = line.time.slice(20,23) %>
             <% let newTime = mm+'/'+dd+'/'+yy+' '+hr+':'+min+":"+ss+"."+ms %>
-            <% let classes = line.type + " " + line.component + " h" + hr + " m" + min %>
+            <% let classes = line.type + " " + line.component + " h" + hr + " m" + min + " s"+ ss %>
             <% if(line.payload){classes += " pay"}else if(line.sqlQuery){classes += " sql"} %>
-            <tr class='<%= classes %>'>
-              <th scope="row"><%= n %></th>
+            <tr class='<%= classes + " no"+ n%> '>
+              <th scope="row"><%= line.place %></th>
               <td><%= newTime %></td>
               <td><%= line.name %></td>
               <td><%= line.type %></td>
@@ -37,7 +40,7 @@
               <td><%= line.msg %></td>
             </tr>
             <% if(line.payload){ %>
-              <tr class="pay<%=n%>">
+              <tr class="<%= classes + " no"+ n+ " pay"+n%>">
                 <td colspan="8">
                   Payload: {
                     <% for (const key of Object.keys(line.payload)) { %>
@@ -61,7 +64,7 @@
                               <%= "}" %>
                               <% } %>
                           <% } else { %>
-                            <%="l2 "+key1 +": "+val1+"," %>
+                            <%=key1 +": "+val1+"," %>
                           <% } %>
                         <% } %>
                         <% } %>
@@ -70,7 +73,7 @@
                       <% } %>
                       <% if(key == 'data'){ %>
                         <% line.payload[key].forEach(function(dataStuff){ %>
-                          <%= dataStuff+"," %>
+                          <%- dataStuff+"," %>
                         <% }) %>
                       <% } %>
                     <% } %>
@@ -78,7 +81,7 @@
               </tr>
             <% } %>
             <% if(line.sqlQuery){ %>
-              <tr class='sql<%=n%>'>
+              <tr class='<%= classes + " no"+ n+ " sql"+n%>'>
                 <td colspan="7">SQL Query: <%= line.sqlQuery %></td>
               </tr>
             <% } %>

@@ -1,0 +1,239 @@
+<% include ../partials/header %>
+<div class="tableRes">
+  <table class="table table-striped table-dark">
+    <thead>
+      <div class="fulltab">
+        <tr>
+          <th>#</th>
+          <th>Time:</th>
+          <th>Name:</th>
+          <th>Type:</th>
+          <th>Component:</th>
+          <th>Level:</th>
+          <th>Message: </th>
+        </tr>
+      </div>
+    </thead>
+    <tbody>
+      <% let n = 1; %>
+      <% data.forEach(function(line){ %>
+        <% let yy = line.time.slice(0,4) %>
+        <% let mm = line.time.slice(5,7) %>
+        <% let dd = line.time.slice(8,10) %>
+        <% let hr = line.time.slice(11,13) %>
+        <% let min = line.time.slice(14,16) %>
+        <% let ss = line.time.slice(17,19) %>
+        <% let ms = line.time.slice(20,23) %>
+        <% let newTime = mm + '/' + dd + '/' + yy + ' '+ hr + ':' + min + ":" + ss + "." + ms %>
+        <% let classes = line.type + " " + line.component + " h" + hr + " m" + min + " s"+ ss %>
+        <% if(line.payload){classes += " pay"}else if(line.sqlQuery){classes += " sql"} %>
+        <tr class='<%= classes + " no" + n %> '>
+          <th scope="row"><%= line.place %></th>
+          <td><%= newTime %></td>
+          <td><%= line.name %></td>
+          <td><%= line.type %></td>
+          <td><%= line.component %></td>
+          <td><%= line.level %></td>
+          <td><%= line.msg %></td>
+        </tr>
+        <% if(line.payload){ %>
+          <tr class="<%= classes + " no"+ n + " pay" + n %>">
+            <td colspan="8">
+              <% if(line.payload === null || line.payload === ''){ %>
+                <% line.payload = "null" %>
+              <% } %>
+              <% if(Array.isArray(line.payload) === true){ %>
+                Payload: [++++++An Array was found in payload. (More Testing Needed(1st Level))+++++++]
+              <% } else { %>
+                Payload: {
+                <% let f = 0 %>
+                <% for (const key of Object.keys(line.payload)) { %>
+                  <% let val = line.payload[key] %>
+                  <% if(val === null || val === ''){ %>
+                      <% val = "null" %>
+                  <% } %>
+                  <% if(Object.is(val, String(val))===true || typeof val === 'boolean' || Object.is(val, Number(val)) === true){ %>
+                    <% if(f > 0){ %>
+                      <%= ", " + key + ": " + val %>
+                    <% } else { %>
+                      <%= key + ": " + val %>
+                    <% } %>
+                  <% } else if(Array.isArray(val) === true){ %>
+                    <%= key + '[++++++An Array was found in payload. (More Testing Needed(2nd Level))+++++++]' %>
+                  <% } else { %>
+                    <%= key + ": {" %>
+                    <% let g = 0 %>
+                    <% for (const key1 of Object.keys(line.payload[key])) { %>
+                      <% let val1 = line.payload[key][key1] %>
+                      <% if(val1 === null || val1 === ''){ %>
+                          <% val1 = "null" %>
+                      <% } %>
+                      <% if(Object.is(val1, String(val1))===true || typeof val1 === 'boolean' || Object.is(val1, Number(val1)) === true){ %>
+                        <% if(g > 0){ %>
+                          <%= ", " + key1 + ": " + val1 %>
+                        <% } else { %>
+                          <%= key1 + ": " + val1 %>
+                        <% } %>
+                      <% } else if(Array.isArray(val1) === true){ %>
+                        ++++++An Array was found in payload. (More Testing Needed(2st Level))+++++++
+                      <% } else { %>
+                        <% let h = 0 %>
+                        <% if(g > 0){ %>
+                          <%= ", " + key1 + ": {" %>
+                        <% } else { %>
+                          <%= key1 + ": {" %>
+                        <% } %>
+                        <% for (const key2 of Object.keys(line.payload[key][key1])) { %>
+                          <% let val2 = line.payload[key][key1][key2] %>
+                          <% if(val2 === null || val2 === ''){ %>
+                              <% val2 = "null" %>
+                          <% } %>
+                          <% if(h > 0){ %>
+                            <%= ", " + key2 + ": " + val2 %>
+                          <% } else { %>
+                            <%= key2 + ": " + val2 %>
+                          <% } %>
+                        <% } %>
+                        }
+                        <% h++ %>
+                      <% } %>
+                      <% g++ %>
+                    <% } %>
+                    }
+                  <% } %>
+                    <% f++ %>
+                  <% } %>
+                  }
+                <% } %>
+              </td>
+            </tr>
+          <% } %>
+          <% if(line.message){ %>
+            <tr class="<%= classes + " no"+ n + " pay" + n %>">
+              <td colspan="8">
+                <% if(line.message === null || line.message === ''){ %>
+                  <% line.message = "null" %>
+                <% } %>
+                <% if(Array.isArray(line.message) === true){ %>
+                  message: [++++++An Array was found in message. (More Testing Needed(1st Level))+++++++]
+                <% } else { %>
+                  Message: {
+                  <% let f = 0 %>
+                  <% for (const key of Object.keys(line.message)) { %>
+                    <% let val = line.message[key] %>
+                    <% if(val === null || val === ''){ %>
+                        <% val = "null" %>
+                    <% } %>
+                    <% if(Object.is(val, String(val))===true || typeof val === 'boolean' || Object.is(val, Number(val)) === true){ %>
+                      <% if(f > 0){ %>
+                        <%= ", " + key + ": " + val %>
+                      <% } else { %>
+                        <%= key + ": " + val %>
+                      <% } %>
+                    <% } else if(Array.isArray(val) === true){ %>
+                      <%= key + '[++++++An Array was found in message. (More Testing Needed(2nd Level))+++++++]' %>
+                    <% } else { %>
+                      <%= key + ": {" %>
+                      <% let g = 0 %>
+                      <% for (const key1 of Object.keys(line.message[key])) { %>
+                        <% let val1 = line.message[key][key1] %>
+                        <% if(val1 === null || val1 === ''){ %>
+                            <% val1 = "null" %>
+                        <% } %>
+                        <% if(Object.is(val1, String(val1))===true || typeof val1 === 'boolean' || Object.is(val1, Number(val1)) === true){ %>
+                          <% if(g > 0){ %>
+                            <%= ", " + key1 + ": " + val1 %>
+                          <% } else { %>
+                            <%= key1 + ": " + val1 %>
+                          <% } %>
+                        <% } else if(Array.isArray(val1) === true){ %>
+                          ++++++An Array was found in payload. (More Testing Needed(2st Level))+++++++
+                        <% } else { %>
+                          <% let h = 0 %>
+                          <% if(g > 0){ %>
+                            <%= ", " + key1 + ": {" %>
+                          <% } else { %>
+                            <%= key1 + ": {" %>
+                          <% } %>
+                          <% for (const key2 of Object.keys(line.message[key][key1])) { %>
+                            <% let val2 = line.message[key][key1][key2] %>
+                            <% if(val2 === null || val2 === ''){ %>
+                                <% val2 = "null" %>
+                            <% } %>
+                            <% if(h > 0){ %>
+                              <%= ", " + key2 + ": " + val2 %>
+                            <% } else { %>
+                              <%= key2 + ": " + val2 %>
+                            <% } %>
+                          <% } %>
+                          }
+                          <% h++ %>
+                        <% } %>
+                        <% g++ %>
+                      <% } %>
+                      }
+                    <% } %>
+                      <% f++ %>
+                    <% } %>
+                    }
+                  <% } %>
+                </td>
+              </tr>
+            <% } %>
+        <% if(line.sqlQuery){ %>
+          <tr class='<%= classes + " no" + n + " sql" + n %>'>
+            <td colspan="7">SQL Query: <%= line.sqlQuery %></td>
+          </tr>
+        <% } %>
+        <% if(line.result){ %>
+          <tr class=<%="'" + classes + " no" + n + " sql" + n + "'" %>>
+            <% if(Object.is(line.result, String(line.result)) === true || typeof line.result === 'boolean' || Object.is(line.result, Number(line.result)) === true){ %>
+              <% if(line.result === null || line.result === ''){ %>
+                <td colspan="7">
+                  Result: null
+                </td>
+              <% } else { %>
+                <td colspan="7">
+                  Result: <%= line.result %>
+                </td>
+              <% } %>
+            <% } %>
+            <% if(typeof(line.result) !== 'Object'){ %>
+              <% if(line.result.constructor === Array){ %>
+                <td colspan="7">
+                Result: [
+                <% let i = 0 %>
+                <% line.result.forEach(function(arrayResult){ %>
+                  <% if(typeof(arrayResult) == 'Object'){ %>
+                    <% for (const key of Object.keys(arrayResult[key])) { %>
+                      <% let val = line.payload[key] %>
+                      <%= key + ": " + val %>
+                    <% } %>
+                  <% } %>
+                    <% if(arrayResult === null || arrayResult === ''){ %>
+                        <% if(i > 0){ %>
+                          <%= ", null" %>
+                        <% } else { %>
+                          <%= "null" %>
+                        <% } %>
+                    <% } else { %>
+                        <% if(i > 0){ %>
+                          <%=", Payload was sent here too!" %>
+                        <% } else { %>
+                          <%= "Payload was sent here!" %>
+                        <% } %>
+                    <% } %>
+                  <% i++ %>
+                <% }) %>
+                ]
+                </td>
+              <% } %>
+            <% } %>
+          </tr>
+        <% } %>
+        <% n++ %>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<% include ../partials/footer %>
