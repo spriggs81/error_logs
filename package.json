@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node --max_old_space_size=2000 app.js"
   },
   "keywords": [],
   "author": "John Spriggs",
@@ -15,8 +15,6 @@
     "event-stream": "^4.0.1",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6-alpha.5",
-    "fs": "0.0.1-security",
-    "line-by-line": "^0.1.6",
-    "tabulator-tables": "^4.4.3"
+    "fs": "0.0.1-security"
   }
 }

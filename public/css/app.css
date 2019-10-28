@@ -3,14 +3,21 @@ body{
 }
 .fulltab{
   position: sticky;
-  top: 50px;
+  top: 60px;
   color: white;
   /* margin: auto; */
-  margin-top: 55px;
+  margin-top: 60px;
   /* margin-bottom: 0; */
   /* display: block; */
   /* overflow-y: auto; */
   /* height: 150px; */
+}
+.bye{
+  display: none;
+}
+
+.subClass{
+  display: none;
 }
 
 .pay{
@@ -19,11 +26,32 @@ body{
 .sql{
 }
 
-/* .filter{
-  display: none;
-} */
+#current{
+  color: white;
+}
 
 .filtering{
   margin-top: 45px;
   border: 2px red solid;
+}
+
+body,
+#txt,
+#hide {
+  font: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+#txt {
+  border: none;
+  color: #888;
+  min-width: 10px;
+}
+
+#hide {
+  position: absolute;
+  height: 0;
+  overflow: hidden;
+  white-space: pre;
 }

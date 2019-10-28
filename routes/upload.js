@@ -1,10 +1,7 @@
 const fs = require('fs');
-//const readline = require('readline');
-//const LineByLineReader = require('line-by-line');
 const es = require('event-stream');
 const express = require('express');
 const router = express.Router({mergeParams: true});
-const Tabulator = require('tabulator-tables');
 
 let newArray = [],
     top100   = [],
@@ -27,6 +24,164 @@ router.post("/upload", function(req, res){
   let check = 1;
   let newline = '';
 
+  function checkPayload(name, data){
+    let payload = '',
+        x       = '';
+      if(name === 'pay'){
+        x = 'Payload'
+      }
+      if(name === "msg"){
+        x = "Message"
+      }
+      if(name === "result"){
+        x = "Result"
+      }
+    if(data === null || data === ''){
+      data = "null"
+    }
+    if(name !== "result"){
+      if(Array.isArray(data) === true){
+        payload += x+": [++++++An Array was found in payload. (More Testing Needed(1st Level))+++++++]"
+      } else {
+        payload += x+": {"
+          let a = 0
+          for (const key of Object.keys(data)) {
+            let val = data[key]
+            if(val === null || val === ''){
+              val = "null"
+            }
+            if(Object.is(val, String(val)) === true || typeof val === 'boolean' || Object.is(val, Number(val)) === true){
+              if(a > 0){
+                payload += ", " + key + ": " + val;
+              } else {
+                payload += key + ": " + val;
+              }
+            } else if(Array.isArray(val) === true) {
+              payload+= key + ": ["
+              let a = 0;
+              for(let ii = 0; ii < val.length; ii++){
+                if(val[ii] === null || val[ii] === ''){
+                  val[ii] = "null"
+                }
+                if(a > 0){
+                  payload += ", "+val[ii];
+                } else {
+                  payload += val[ii];
+                }
+                a++;
+              }
+              payload+= " ]"
+            } else {
+              if(a > 0){
+                payload += ", " + key + ": {"
+              } else {
+                payload += key + ": {"
+              }
+              let b = 0
+              for (const key1 of Object.keys(data[key])) {
+                let val1 = data[key][key1]
+                if(val1 === null || val1 === ''){
+                  val1 = "null"
+                }
+                if(Object.is(val1, String(val1))===true || typeof val1 === 'boolean' || Object.is(val1, Number(val1)) === true){
+                  if(b > 0){
+                    payload += ", " + key1 + ": " + val1
+                  } else {
+                    payload += key1 + ": " + val1
+                  }
+                } else if(Array.isArray(val1) === true){
+                  payload += key1 + '[++++++An Array was found in '+x+'. (More Testing Needed(real 2nd Level))+++++++]'
+                } else {
+                  let c = 0
+                  if(b > 0){
+                    payload += ", " + key1 + ": {"
+                  } else {
+                    payload += key1 + ": {"
+                  }
+                  for (const key2 of Object.keys(data[key][key1])) {
+                    let val2 = data[key][key1][key2]
+                    if(val2 === null || val2 === ''){
+                      val2 = "null"
+                    }
+                    if(c > 0){
+                      payload += ", " + key2 + ": " + val2
+                    } else {
+                      payload += key2 + ": " + val2
+                    }
+                    c++
+                  }
+                  payload += "}"
+                }
+                b++
+              }
+              payload += "}"
+            }
+            a++
+          }
+        payload += "}"
+        }
+      } else if(name === 'result'){
+        if(data === null || data === ''){
+          data = "null";
+        }
+        if(Object.is(data, String(data)) === true || typeof data === 'boolean' || Object.is(data, Number(data)) === true){
+          payload += "Result: " + data
+        } else if(Array.isArray(data) === true){
+          payload += "Result: ["
+          let i = 0
+          data.forEach(function(arrayResult){
+            if(arrayResult === null || arrayResult === ''){
+              if(i > 0){
+                payload += ", null"
+              } else {
+                payload += "null"
+              }
+            } else {
+              if(i > 0){
+                payload += ", Payload was sent here!"
+              } else {
+                payload += "Payload was sent here!"
+              }
+            }
+            i++
+          })
+          payload += "]"
+        } else {
+          let a = 0;
+          payload += "Result:{"
+          for (const key of Object.keys(data)) {
+            let val = data[key]
+            if(val === null || val === ''){
+              val = "null";
+            }
+            if(a > 0){
+              payload += ", "+key+": "+val
+            } else {
+              payload += key + ": " + val
+            }
+            a++
+          }
+          payload += "}"
+      }
+
+    }
+
+    if(payload !== ''){
+      if(name === 'pay'){
+        newline.newPayload = payload
+        return newline.newPayload
+      }
+      if(name === "msg"){
+        newline.newMsg = payload
+        return newline.newMsg
+      }
+      if(name === "result"){
+        newline.newResult = payload
+        return newline.newResult
+      }
+
+    }
+  }
   const s = fs.createReadStream(info)
   .pipe(es.split())
   .pipe(es.mapSync(function(line){
@@ -44,14 +199,34 @@ router.post("/upload", function(req, res){
     if(checkLine == '{"name"'){
       //console.log("made it x: "+i);
       newline = JSON.parse(line);
-      newline.place = i
-      if(newline.place <= 200){
-        top100.push(newline);
+      if(newline.payload){
+        checkPayload("pay", newline.payload);
       }
+      if(newline.message){
+        checkPayload("msg", newline.message);
+      }
+      if(newline.result){
+        checkPayload("result", newline.result);
+      }
+      if(newline.sqlQuery){
+        newline.newSql = newline.sqlQuery.toString();
+      }
+      newline.place = i;
+      let yy = newline.time.slice(0,4)
+      let mm = newline.time.slice(5,7)
+      let dd = newline.time.slice(8,10)
+      let hr = newline.time.slice(11,13)
+      let min = newline.time.slice(14,16)
+      let ss = newline.time.slice(17,19)
+      let ms = newline.time.slice(20,23)
+      let newTime = mm + '/' + dd + '/' + yy + ' '+ hr + ':' + min + ":" + ss + "." + ms
+      newline.newTime = newTime;
       newArray.push(newline);
       i++
     }
-    if(newline.place === 1000){
+
+
+    if(newline.place === 1000000){
       startData();
       res.redirect("/loading");
     }
@@ -81,10 +256,9 @@ router.post("/upload", function(req, res){
       return top100, newArray, type, comp, hrs, mins
     }
     returning();
-    console.log('Read entire file.')
     if(done === true){
       res.redirect('/data')
-      //res.render('pages/show',{data:top100, allData:newArray, type:type, comp:comp, hrs:hrs, mins:mins})
+      //res.render('pages/show',{data:top100, type:type, comp:comp, hrs:hrs, mins:mins})
     }
     if(done === false){
       dataDone();
@@ -98,8 +272,8 @@ router.get('/loading', function(req, res){
 letSee(done);
 
   function letSee(x){
-    console.log('checking done :'+m);
     if(x == true){
+      m = 0;
       res.redirect('/data');
     } else {
       setTimeout(function(){
@@ -124,7 +298,7 @@ router.get('/data', function(req, res){
 
 
 
-    res.render('pages/show2',{data:newArray, allData:newArray, type:type, comp:comp, hrs:hrs, mins:mins});
+    res.render('pages/show',{data:JSON.stringify(newArray), allData:newArray, type:type, comp:comp, hrs:hrs, mins:mins});
 });
 
 function startData(){
@@ -136,5 +310,7 @@ function dataDone(){
   done = true;
   return done;
 }
+
+
 
 module.exports = router;

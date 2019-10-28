@@ -1,93 +1,187 @@
 <% include ../partials/header %>
-    <div class="filtering">
-        <h1>Here You!</h1>
-    </div>
-    <div class="tableRes">
-      <table class="table table-striped table-dark">
-        <thead>
-          <div class="fulltab">
-            <tr>
-              <th>#</th>
-              <th>Time:</th>
-              <th>Name:</th>
-              <th>Type:</th>
-              <th>Component:</th>
-              <th>Level:</th>
-              <th>Message: </th>
-            </tr>
-          </div>
-        </thead>
-        <tbody>
-          <% let n = 1; %>
-          <% data.forEach(function(line){ %>
-            <% let yy = line.time.slice(0,4) %>
-            <% let mm = line.time.slice(5,7) %>
-            <% let dd = line.time.slice(8,10) %>
-            <% let hr = line.time.slice(11,13) %>
-            <% let min = line.time.slice(14,16) %>
-            <% let ss = line.time.slice(17,19) %>
-            <% let ms = line.time.slice(20,23) %>
-            <% let newTime = mm+'/'+dd+'/'+yy+' '+hr+':'+min+":"+ss+"."+ms %>
-            <% let classes = line.type + " " + line.component + " h" + hr + " m" + min + " s"+ ss %>
-            <% if(line.payload){classes += " pay"}else if(line.sqlQuery){classes += " sql"} %>
-            <tr class='<%= classes + " no"+ n%> '>
-              <th scope="row"><%= line.place %></th>
-              <td><%= newTime %></td>
-              <td><%= line.name %></td>
-              <td><%= line.type %></td>
-              <td><%= line.component %></td>
-              <td><%= line.level %></td>
-              <td><%= line.msg %></td>
-            </tr>
-            <% if(line.payload){ %>
-              <tr class="<%= classes + " no"+ n+ " pay"+n%>">
-                <td colspan="8">
-                  Payload: {
-                    <% for (const key of Object.keys(line.payload)) { %>
-                      <% let val = line.payload[key] %>
-                      <% if(typeof(val) === 'object'){ %>
-                        <%= key+": { " %>
-                        <% if(val === null){ %>
-                          <%= null %>
-                        <% } else {%>
-                        <% for (const key1 of Object.keys(line.payload[key])) { %>
-                          <% let val1 = line.payload[key][key1] %>
-                          <% if(typeof(val1) === 'object'){ %>
-                            <%= key1+": { " %>
-                            <% if(val1 === null){ %>
-                              <%= null %>
-                            <% } else {%>
-                            <% for (const key2 of Object.keys(line.payload[key][key1])) { %>
-                              <% let val2 = line.payload[key][key1][key2] %>
-                                <%= key2 + ": " + val2 %>
-                            <% } %>
-                              <%= "}" %>
-                              <% } %>
-                          <% } else { %>
-                            <%=key1 +": "+val1+"," %>
-                          <% } %>
-                        <% } %>
-                        <% } %>
-                      <% } else { %>
-                        <%= key +": "+val+"," %>
-                      <% } %>
-                      <% if(key == 'data'){ %>
-                        <% line.payload[key].forEach(function(dataStuff){ %>
-                          <%- dataStuff+"," %>
-                        <% }) %>
-                      <% } %>
-                    <% } %>
-                </td>
-              </tr>
-            <% } %>
-            <% if(line.sqlQuery){ %>
-              <tr class='<%= classes + " no"+ n+ " sql"+n%>'>
-                <td colspan="7">SQL Query: <%= line.sqlQuery %></td>
-              </tr>
-            <% } %>
-          <% n++ %>
-        <% }) %>
-        </tbody>
-      </table>
-    </div>
+
+<div class="fulltab" style="text-align:center;">
+  <input type="button" id="first" onclick="firstPage()" value="first" />
+  <input type="button" id="next" onclick="nextPage()" value="next" />
+  <input type="button" id="previous" onclick="previousPage()" value="previous" />
+  <input type="button" id="last" onclick="lastPage()" value="last" />
+</div>
+<div id='list'></div>
+<script type="text/javascript">
+let list = <%-data %>;
+let pageList = [];
+let currentPage = 1;
+const numberPerPage = 499;
+let numberOfPages = 1;
+
+
+
+function makeList() {
+    numberOfPages = getNumberOfPages();
+}
+
+function getNumberOfPages() {
+    return Math.ceil(list.length / numberPerPage);
+}
+
+function nextPage() {
+    currentPage += 1;
+    loadList();
+}
+
+function previousPage() {
+    currentPage -= 1;
+    loadList();
+}
+
+function firstPage() {
+    currentPage = 1;
+    loadList();
+}
+
+function lastPage() {
+    currentPage = numberOfPages;
+    loadList();
+}
+
+function loadList() {
+    var begin = ((currentPage - 1) * numberPerPage);
+    var end = begin + numberPerPage;
+
+    pageList = list.slice(begin, end);
+    drawList();
+    check();
+}
+
+function drawList() {
+    const head = '<table class="table table-striped table-dark"><thead><tr><th>#</th><th>Time:</th><th>Name:</th><th>Type:</th><th>Component:</th><th>Level:</th><th>Message: </th></tr></div></thead><tbody>';
+    // const end = '</tbody></table></div>'
+    document.getElementById("current").innerHTML = "";
+    document.getElementById("list").innerHTML = "";
+    document.getElementById("list").innerHTML += head;
+    document.getElementById("current").innerHTML = "Page: "+currentPage+' / '+numberOfPages;
+    document.getElementById("current").classList.add("navbar-nav","mr-auto");
+      // get the reference for the body
+        var body = document.getElementsByTagName('div')[2];
+
+        // creates a <table> element and a <tbody> element
+        var tbl = document.getElementsByTagName("table")[0];
+        var tblBody = document.getElementsByTagName("tbody")[0];
+
+        // creating all cells
+        let r1 = '', r2 = '', r3 = '', r4 = '';
+        for (r = 0; r < pageList.length; r++) {
+          r1 = null, r2 = null, r3 = null, r4 = null
+          let obj = pageList[r];
+          // creates a table row
+          let row0 = document.createElement("tr");
+          let row1 = document.createElement("tr");
+          let row2 = document.createElement("tr");
+          let row3 = document.createElement("tr");
+          let row4 = document.createElement("tr");
+            // Create a <td> element and a text node, make the text
+            // node the contents of the <td>, and put the <td> at
+            // the end of the table row
+            let cell0 = document.createElement("td");
+            let cellText0 = document.createTextNode(obj.place);
+            let cell1 = document.createElement("td");
+            let cellText1 = document.createTextNode(obj.newTime)
+            let cell2 = document.createElement("td");
+            let cellText2 = document.createTextNode(obj.name);
+            let cell3 = document.createElement("td");
+            let cellText3 = document.createTextNode(obj.type)
+            let cell4 = document.createElement("td");
+            let cellText4 = document.createTextNode(obj.component);
+            let cell5 = document.createElement("td");
+            let cellText5 = document.createTextNode(obj.level)
+            let cell6 = document.createElement("td");
+            let cellText6 = document.createTextNode(obj.msg);
+            cell0.appendChild(cellText0);
+            row0.appendChild(cell0);
+            cell1.appendChild(cellText1);
+            row0.appendChild(cell1);
+            cell2.appendChild(cellText2);
+            row0.appendChild(cell2);
+            cell3.appendChild(cellText3);
+            row0.appendChild(cell3);
+            cell4.appendChild(cellText4);
+            row0.appendChild(cell4);
+            cell5.appendChild(cellText5);
+            row0.appendChild(cell5);
+            cell6.appendChild(cellText6);
+            row0.appendChild(cell6);
+            if(obj.payload){
+              var cell7 = document.createElement("td");
+              var cellText7 = document.createTextNode(obj.newPayload);
+              cell7.appendChild(cellText7);
+              cell7.setAttribute("colspan", "8");
+              row1.appendChild(cell7)
+              r1 = 1
+            }
+            if(obj.message){
+              var cell8 = document.createElement("td");
+              var cellText8 = document.createTextNode(obj.newMsg);
+              cell8.appendChild(cellText8);
+              cell8.setAttribute("colspan", "8");
+              row2.appendChild(cell8)
+              r2 = 1
+            }
+            if(obj.result){
+              var cell9 = document.createElement("td");
+              var cellText9 = document.createTextNode(obj.newResult);
+              cell9.appendChild(cellText9);
+              cell9.setAttribute("colspan", "8");
+              row3.appendChild(cell9)
+              r3 = 1
+            }
+            if(obj.sqlQuery){
+              var cell10 = document.createElement("td");
+              var cellText10 = document.createTextNode("SQL Query:<br>"+obj.sqlQuery);
+              cell10.appendChild(cellText10);
+              cell10.setAttribute("colspan", "8");
+              row4.appendChild(cell10)
+              r4 = 1
+            }
+          // add the row to the end of the table body
+          tblBody.appendChild(row0);
+          if(r1 !== null){
+            tblBody.appendChild(row1)
+          }
+          if(r2 !== null){
+            tblBody.appendChild(row2)
+          }
+          if(r3 !== null){
+            tblBody.appendChild(row3)
+          }
+          if(r4 !== null){
+            tblBody.appendChild(row4)
+          }
+        }
+
+        // put the <tbody> in the <table>
+        tbl.appendChild(tblBody);
+        // appends <table> into <body>
+        body.appendChild(tbl);
+        // sets the border attribute of tbl to 2;
+        tbl.setAttribute("border", "2");
+
+      }
+
+
+function check() {
+    document.getElementById("next").disabled = currentPage == numberOfPages ? true : false;
+    document.getElementById("previous").disabled = currentPage == 1 ? true : false;
+    document.getElementById("first").disabled = currentPage == 1 ? true : false;
+    document.getElementById("last").disabled = currentPage == numberOfPages ? true : false;
+}
+
+function load() {
+  console.dir(document);
+     makeList();
+     loadList();
+}
+
+window.onload = load;
+</script>
+
 <% include ../partials/footer %>
