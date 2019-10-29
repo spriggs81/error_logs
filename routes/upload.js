@@ -226,10 +226,10 @@ router.post("/upload", function(req, res){
     }
 
 
-    // if(newline.place === 1000000){
-    //   startData();
-    //   res.redirect("/loading");
-    // }
+    if(newline.place === 5000){
+      startData();
+      res.redirect("/loading");
+    }
     check++
     // function below was for logging memory usage
     //slogMemoryUsage(lineNr);
@@ -278,7 +278,7 @@ letSee(done);
     } else {
       setTimeout(function(){
         res.redirect('/loading')
-      }, 1000)
+      }, 2000)
     }
     m++
   }
