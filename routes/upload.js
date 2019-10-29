@@ -285,20 +285,20 @@ letSee(done);
 })
 
 router.get('/data', function(req, res){
-  const directory = '/tmp';
-  fs.readdir(directory, (err, files) => {
-    if (err) throw err;
-
-    for (const file of files) {
-      fs.unlink( directory+"/"+file, function( err ) {
-          if ( err ) return console.log( err );
-      });
-    }
-  });
-  res.render('pages/show',{data:JSON.stringify(newArray), allData:newArray, type:type, comp:comp, hrs:hrs, mins:mins});
+  res.render('pages/error');
 });
 
   router.get('/data/page:number', function(req, res){
+    const directory = '/tmp';
+    fs.readdir(directory, (err, files) => {
+      if (err) throw err;
+
+      for (const file of files) {
+        fs.unlink( directory+"/"+file, function( err ) {
+            if ( err ) return console.log( err );
+        });
+      }
+    });
     let page = req.params.number
     page = Number(page);
     let pageList = [];
