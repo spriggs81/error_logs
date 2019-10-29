@@ -3,6 +3,26 @@ const es = require('event-stream');
 const express = require('express');
 const router = express.Router({mergeParams: true});
 
+function serverTime(){
+  const now = new Date();
+  const yy = now.getFullYear();
+  const mm = now.getMonth();
+  const dd = now.getDate();
+  const hh = now.getHours();
+  const mi = now.getMinutes();
+  const ss = now.getSeconds();
+  const ms = now.getMilliseconds();
+
+  function checkZero(x){
+    const xx = x.toString();
+    if(xx.length == 1){
+      return "0" + x.toString();
+    }
+    return x
+  }
+  return checkZero(mm)+"/"+checkZero(dd)+"/"+yy+" "+checkZero(hh)+":"+checkZero(mi)+":"+checkZero(ss)+"."+ms;
+}
+
 let newArray = [],
     top100   = [],
     type = [],
@@ -17,6 +37,7 @@ router.get("/", function(req, res){
 })
 
 router.post("/upload", function(req, res){
+  console.log("Upload started at: "+serverTime());
     newArray = [];
     top100 = [];
   let info = req.files.datafile.tempFilePath
@@ -290,7 +311,7 @@ router.get('/data', function(req, res){
 });
 
   router.get('/data/page:number', function(req, res){
-    const directory = '/tmp';
+    const directory = 'tmp';
     fs.readdir(directory, (err, files) => {
       if (err) throw err;
 
@@ -320,13 +341,14 @@ router.get('/data', function(req, res){
     }
 
     function loadList() {
-      if(isNaN(page) === true || page < 1 || page > numberOfPages){
+      if(isNaN(page) === true || page < 1 || page > numberOfPages || newArray.length <= 0){
         let total = newArray.length;
         res.render('pages/error',{total:total});
       }
         var begin = ((currentPage - 1) * numberPerPage);
         var end = begin + numberPerPage;
         pageList = newArray.slice(begin, end);
+        console.log("Page being served up at: "+serverTime());
         res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages});
     }
 });

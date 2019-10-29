@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 const fileUpload = require('express-fileupload');
 const route = require('./routes/upload')
 const app = express();
@@ -7,10 +8,15 @@ const app = express();
 let port = process.env.PORT,// || 411,
     ip = process.env.IP;// || 'localhost';
 
+    var dir = './tmp';
+
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+    }
 //const testMods = require("../mods/testMod")
 app.use(fileUpload({
   useTempFiles: true,
-  temoFileDir: '/tmp/'
+  temoFileDir: './tmp/'
 }));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
