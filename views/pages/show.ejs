@@ -9,46 +9,34 @@
 <div id='list'></div>
 <script type="text/javascript">
 let list = <%-data %>;
-let pageList = [];
-let currentPage = 1;
-const numberPerPage = 499;
-let numberOfPages = 1;
-
-
-
-function makeList() {
-    numberOfPages = getNumberOfPages();
-}
-
-function getNumberOfPages() {
-    return Math.ceil(list.length / numberPerPage);
-}
+let pageList = list;
+let currentPage = <%= current %>;
+let numberOfPages = <%= total %>;
 
 function nextPage() {
     currentPage += 1;
-    loadList();
+    loadPage(currentPage);
 }
 
 function previousPage() {
     currentPage -= 1;
-    loadList();
+    loadPage(currentPage);
 }
 
 function firstPage() {
     currentPage = 1;
-    loadList();
+    loadPage(currentPage);
 }
 
 function lastPage() {
     currentPage = numberOfPages;
-    loadList();
+    loadPage(currentPage);
 }
 
+function loadPage(x){
+  location.href = '/data/page'+x
+}
 function loadList() {
-    var begin = ((currentPage - 1) * numberPerPage);
-    var end = begin + numberPerPage;
-
-    pageList = list.slice(begin, end);
     drawList();
     check();
 }
@@ -59,7 +47,7 @@ function drawList() {
     document.getElementById("current").innerHTML = "";
     document.getElementById("list").innerHTML = "";
     document.getElementById("list").innerHTML += head;
-    document.getElementById("current").innerHTML = "Page: "+currentPage+' / '+numberOfPages;
+    document.getElementById("current").innerHTML = "Page: <%= current %> / <%= total %>";
     document.getElementById("current").classList.add("navbar-nav","mr-auto");
       // get the reference for the body
         var body = document.getElementsByTagName('div')[2];
@@ -176,8 +164,6 @@ function check() {
 }
 
 function load() {
-  console.dir(document);
-     makeList();
      loadList();
 }
 

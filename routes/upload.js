@@ -257,7 +257,7 @@ router.post("/upload", function(req, res){
     }
     returning();
     if(done === true){
-      res.redirect('/data')
+      res.redirect('/data/page1')
       //res.render('pages/show',{data:top100, type:type, comp:comp, hrs:hrs, mins:mins})
     }
     if(done === false){
@@ -295,10 +295,38 @@ router.get('/data', function(req, res){
       });
     }
   });
+  res.render('pages/show',{data:JSON.stringify(newArray), allData:newArray, type:type, comp:comp, hrs:hrs, mins:mins});
+});
 
+  router.get('/data/page:number', function(req, res){
+    let page = req.params.number
+    page = Number(page);
+    let pageList = [];
+    let currentPage = page;
+    const numberPerPage = 1000;
+    let numberOfPages = 1;
+    load();
+    function load(){
+      makeList()
+      loadList()
+    }
+    function makeList() {
+        numberOfPages = getNumberOfPages();
+    }
 
+    function getNumberOfPages() {
+        return Math.ceil(newArray.length / numberPerPage);
+    }
 
-    res.render('pages/show',{data:JSON.stringify(newArray), allData:newArray, type:type, comp:comp, hrs:hrs, mins:mins});
+    function loadList() {
+      if(isNaN(page) === true || page < 1 || page > numberOfPages){
+        res.render('pages/error');
+      }
+        var begin = ((currentPage - 1) * numberPerPage);
+        var end = begin + numberPerPage;
+        pageList = newArray.slice(begin, end);
+        res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages});
+    }
 });
 
 function startData(){
