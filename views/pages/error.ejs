@@ -1,1 +1,7 @@
-<h1>Not sure how you made it here but please feel free to start over</h1><a href="/page1">Click Here</a>
+<% if(total =< 0){ %>
+  <h1>Well that's no fun, there's no more data in here!  But to step 1 you go!</h1>
+  <a href="/">Click Here</a>
+<% } else { %>
+  <h1>Not sure how you made it here but please feel free to start over!</h1>
+  <a href="/page1">Click Here</a>
+<% } %>

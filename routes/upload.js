@@ -274,7 +274,7 @@ letSee(done);
   function letSee(x){
     if(x == true){
       m = 0;
-      res.redirect('/data');
+      res.redirect('/data/page1');
     } else {
       setTimeout(function(){
         res.redirect('/loading')
@@ -285,7 +285,8 @@ letSee(done);
 })
 
 router.get('/data', function(req, res){
-  res.render('pages/error');
+  let total = newArray.length;
+  res.render('pages/error',{total:total});
 });
 
   router.get('/data/page:number', function(req, res){
@@ -303,7 +304,7 @@ router.get('/data', function(req, res){
     page = Number(page);
     let pageList = [];
     let currentPage = page;
-    const numberPerPage = 1000;
+    const numberPerPage = 500;
     let numberOfPages = 1;
     load();
     function load(){
@@ -320,7 +321,8 @@ router.get('/data', function(req, res){
 
     function loadList() {
       if(isNaN(page) === true || page < 1 || page > numberOfPages){
-        res.render('pages/error');
+        let total = newArray.length;
+        res.render('pages/error',{total:total});
       }
         var begin = ((currentPage - 1) * numberPerPage);
         var end = begin + numberPerPage;
