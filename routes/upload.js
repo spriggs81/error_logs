@@ -45,6 +45,8 @@ router.post("/upload", function(req, res){
   let check = 1;
   let newline = '';
 
+  console.log(req.files)
+
   function checkPayload(name, data){
     let payload = '',
         x       = '';
@@ -279,7 +281,6 @@ router.post("/upload", function(req, res){
     returning();
     if(done === true){
       res.redirect('/data/page1')
-      //res.render('pages/show',{data:top100, type:type, comp:comp, hrs:hrs, mins:mins})
     }
     if(done === false){
       dataDone();
@@ -341,7 +342,7 @@ router.get('/data', function(req, res){
     }
 
     function loadList() {
-      if(isNaN(page) === true || page < 1 || page > numberOfPages || newArray.length <= 0){
+      if(numberOfPages === 0 || isNaN(page) === true || page < 1 || page > numberOfPages || newArray.length <= 0 || !newArray || newArray === '' || newArray === []){
         let total = newArray.length;
         res.render('pages/error',{total:total});
       }
