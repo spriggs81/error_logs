@@ -5,15 +5,15 @@ const fileUpload = require('express-fileupload');
 const route = require('./routes/upload')
 const app = express();
 
-let port = process.env.PORT,// || 411,
-    ip = process.env.IP;// || 'localhost';
+let port = process.env.PORT || 411,
+    ip = process.env.IP || 'localhost';
 
     var dir = './tmp';
 
     if (!fs.existsSync(dir)){
         fs.mkdirSync(dir);
     }
-//const testMods = require("../mods/testMod")
+
 app.use(fileUpload({
   useTempFiles: true,
   temoFileDir: './tmp/'
@@ -26,5 +26,5 @@ app.use(bodyParser.json());
 app.use('/',route);
 
 app.listen(port, ip, function(){
-  console.log('Server Online!');
+  console.log('Server Online! Please goto: '+ip+":"+port);
 })

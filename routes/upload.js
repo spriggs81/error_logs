@@ -45,7 +45,9 @@ router.post("/upload", function(req, res){
   let check = 1;
   let newline = '';
 
-  console.log(req.files)
+  if(req.files === ''){
+    res.redirect('/data/page1');
+  }
 
   function checkPayload(name, data){
     let payload = '',
@@ -62,132 +64,7 @@ router.post("/upload", function(req, res){
     if(data === null || data === ''){
       data = "null"
     }
-    if(name !== "result"){
-      if(Array.isArray(data) === true){
-        payload += x+": [++++++An Array was found in payload. (More Testing Needed(1st Level))+++++++]"
-      } else {
-        payload += x+": {"
-          let a = 0
-          for (const key of Object.keys(data)) {
-            let val = data[key]
-            if(val === null || val === ''){
-              val = "null"
-            }
-            if(Object.is(val, String(val)) === true || typeof val === 'boolean' || Object.is(val, Number(val)) === true){
-              if(a > 0){
-                payload += ", " + key + ": " + val;
-              } else {
-                payload += key + ": " + val;
-              }
-            } else if(Array.isArray(val) === true) {
-              payload+= key + ": ["
-              let a = 0;
-              for(let ii = 0; ii < val.length; ii++){
-                if(val[ii] === null || val[ii] === ''){
-                  val[ii] = "null"
-                }
-                if(a > 0){
-                  payload += ", "+val[ii];
-                } else {
-                  payload += val[ii];
-                }
-                a++;
-              }
-              payload+= " ]"
-            } else {
-              if(a > 0){
-                payload += ", " + key + ": {"
-              } else {
-                payload += key + ": {"
-              }
-              let b = 0
-              for (const key1 of Object.keys(data[key])) {
-                let val1 = data[key][key1]
-                if(val1 === null || val1 === ''){
-                  val1 = "null"
-                }
-                if(Object.is(val1, String(val1))===true || typeof val1 === 'boolean' || Object.is(val1, Number(val1)) === true){
-                  if(b > 0){
-                    payload += ", " + key1 + ": " + val1
-                  } else {
-                    payload += key1 + ": " + val1
-                  }
-                } else if(Array.isArray(val1) === true){
-                  payload += key1 + '[++++++An Array was found in '+x+'. (More Testing Needed(real 2nd Level))+++++++]'
-                } else {
-                  let c = 0
-                  if(b > 0){
-                    payload += ", " + key1 + ": {"
-                  } else {
-                    payload += key1 + ": {"
-                  }
-                  for (const key2 of Object.keys(data[key][key1])) {
-                    let val2 = data[key][key1][key2]
-                    if(val2 === null || val2 === ''){
-                      val2 = "null"
-                    }
-                    if(c > 0){
-                      payload += ", " + key2 + ": " + val2
-                    } else {
-                      payload += key2 + ": " + val2
-                    }
-                    c++
-                  }
-                  payload += "}"
-                }
-                b++
-              }
-              payload += "}"
-            }
-            a++
-          }
-        payload += "}"
-        }
-      } else if(name === 'result'){
-        if(data === null || data === ''){
-          data = "null";
-        }
-        if(Object.is(data, String(data)) === true || typeof data === 'boolean' || Object.is(data, Number(data)) === true){
-          payload += "Result: " + data
-        } else if(Array.isArray(data) === true){
-          payload += "Result: ["
-          let i = 0
-          data.forEach(function(arrayResult){
-            if(arrayResult === null || arrayResult === ''){
-              if(i > 0){
-                payload += ", null"
-              } else {
-                payload += "null"
-              }
-            } else {
-              if(i > 0){
-                payload += ", Payload was sent here!"
-              } else {
-                payload += "Payload was sent here!"
-              }
-            }
-            i++
-          })
-          payload += "]"
-        } else {
-          let a = 0;
-          payload += "Result:{"
-          for (const key of Object.keys(data)) {
-            let val = data[key]
-            if(val === null || val === ''){
-              val = "null";
-            }
-            if(a > 0){
-              payload += ", "+key+": "+val
-            } else {
-              payload += key + ": " + val
-            }
-            a++
-          }
-          payload += "}"
-      }
-
-    }
+    payload += x+": "+checkInfo(data)
 
     if(payload !== ''){
       if(name === 'pay'){
@@ -216,11 +93,7 @@ router.post("/upload", function(req, res){
 
     // process line here and call s.resume() when rdy
     let checkLine = line.slice(0,7);
-    // console.log(checkLine);
-    // i++
-    // console.log('Reading line: '+i);
     if(checkLine == '{"name"'){
-      //console.log("made it x: "+i);
       newline = JSON.parse(line);
       if(newline.payload){
         checkPayload("pay", newline.payload);
@@ -276,7 +149,7 @@ router.post("/upload", function(req, res){
     });
 
     function returning(){
-      return top100, newArray, type, comp, hrs, mins
+      return newArray, type, comp, hrs, mins
     }
     returning();
     if(done === true){
@@ -308,7 +181,7 @@ letSee(done);
 
 router.get('/data', function(req, res){
   let total = newArray.length;
-  res.render('pages/error',{total:total});
+  res.redirect('/data/page1');
 });
 
   router.get('/data/page:number', function(req, res){
@@ -354,6 +227,10 @@ router.get('/data', function(req, res){
     }
 });
 
+router.get('/filter', function(req, res){
+  res.render('pages/filter');
+})
+
 function startData(){
   done = false;
   return done;
@@ -362,6 +239,50 @@ function startData(){
 function dataDone(){
   done = true;
   return done;
+}
+
+function checkInfo(x){
+  payload = ''
+  let n = 0;
+  if(Object.is(x, String(x)) === true || typeof x === 'boolean' || Object.is(x, Number(x)) === true){
+    if (n > 0){
+      payload += ", "+x
+    } else {
+      payload += x
+    }
+  } else if(Array.isArray(x) === true) {
+    payload += ": ["
+    let a = 0;
+    for(let ii = 0; ii < x.length; ii++){
+      if(x[ii] === null || x[ii] === ''){
+        x[ii] = "null"
+      }
+      if(a > 0){
+        payload += ", " + checkInfo(x[ii]);
+      } else {
+        payload += checkInfo(x[ii]);
+      }
+      a++;
+    }
+    payload+= " ]"
+  } else {
+    let a = 0;
+    payload += "{"
+    for (const key of Object.keys(x)) {
+      let val = x[key]
+      if(val === null || val === ''){
+        val = "null";
+      }
+      if(a > 0){
+        payload += ", "+key+": "+ checkInfo(val)
+      } else {
+        payload += key + ": " + checkInfo(val)
+      }
+      a++
+    }
+    payload += "}"
+}
+return payload
 }
 
 
