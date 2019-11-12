@@ -138,12 +138,12 @@ router.post("/upload", function(req, res){
     //slogMemoryUsage(lineNr);
 
     // resume the readstream, possibly from a callback
-    if(j == 100000){
+    if(j == 50000){
       setTimeout(function(){
         j = 1;
         s.resume();
         return j;
-      }, 1000);
+      }, 5000);
     } else {
       s.resume();
     }
