@@ -38,10 +38,11 @@ router.get("/", function(req, res){
 })
 
 router.post("/upload", function(req, res){
-  console.log("Upload started at: "+serverTime());
+  // console.log("Upload started at: "+serverTime());
     newArray = [];
   let info = req.files.datafile.tempFilePath
   let i = 1;
+  let j = 1;
   let check = 1;
   let newline = '';
 
@@ -88,7 +89,13 @@ router.post("/upload", function(req, res){
 
     // pause the readstream
     s.pause();
-
+    // if(j == 100000){
+    //   setTimeout(function(){
+    //     j = 1;
+    //     // console.log("break: "+serverTime());
+    //     return j;
+    //   }, 5000);
+    // }
     //lineNr += 1;
 
     // process line here and call s.resume() when rdy
@@ -122,16 +129,25 @@ router.post("/upload", function(req, res){
     }
 
 
-    if(newline.place === 5000){
-      startData();
-      res.redirect("/loading");
-    }
+    // if(newline.place === 5000){
+    //   startData();
+    //   res.redirect("/loading");
+    // }
     check++
     // function below was for logging memory usage
     //slogMemoryUsage(lineNr);
 
     // resume the readstream, possibly from a callback
-    s.resume();
+    if(j == 100000){
+      setTimeout(function(){
+        j = 1;
+        s.resume();
+        return j;
+      }, 1000);
+    } else {
+      s.resume();
+    }
+    j++
   })
   .on('error', function(err){
     console.log('Error while reading file.', err);
@@ -139,6 +155,7 @@ router.post("/upload", function(req, res){
   .on('end', function(){
     type = [];
     comp = [];
+    lev = [];
     hrs = [];
     mins = [];
     newArray.forEach(function(value){
@@ -186,16 +203,24 @@ router.get('/data', function(req, res){
 });
 
 router.get('/data/page:number', function(req, res){
-  const directory = 'tmp';
-  fs.readdir(directory, (err, files) => {
-    if (err) throw err;
+  const directory = ['./tmp','/tmp'];
+  for(let i= 0; i < directory.length; i++){
+    fs.readdir(directory[i], (err, files) => {
+      if (err) throw err;
+      // if(files){
+      if(files.length > 0){
+        for (const file of files) {
+          fs.unlink( directory[i]+"/"+file, function( err ) {
+              if ( err ) return console.log( err );
+          });
+        }
+      }
 
-    for (const file of files) {
-      fs.unlink( directory+"/"+file, function( err ) {
-          if ( err ) return console.log( err );
-      });
-    }
-  });
+      // }
+
+    });
+  }
+
   let page = req.params.number
   page = Number(page);
   let pageList = [];
@@ -223,7 +248,7 @@ router.get('/data/page:number', function(req, res){
       var begin = ((currentPage - 1) * numberPerPage);
       var end = begin + numberPerPage;
       pageList = newArray.slice(begin, end);
-      console.log("Page being served up at: "+serverTime());
+      // console.log("Page being served up at: "+serverTime());
       res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
   }
 });
@@ -386,7 +411,7 @@ router.get('/filter/page:number', function(req, res){
       var begin = ((currentPage - 1) * numberPerPage);
       var end = begin + numberPerPage;
       pageList = filteredData.slice(begin, end);
-      console.log("Page being served up at: "+serverTime());
+      // console.log("Page being served up at: "+serverTime());
       res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
   }
 });
