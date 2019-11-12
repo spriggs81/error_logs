@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node --max-old-space-size=4096 app.js"
+    "start": "node --max-old-space-size=5096 app.js"
   },
   "keywords": [],
   "author": "John Spriggs",

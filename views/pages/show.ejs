@@ -44,7 +44,7 @@
         <% if(lev){ %>
           <ul class="boxing">
           <% for(let i = 0; i < lev.length; i++){ %>
-            <input type="checkbox" name="lev" value="<%= lev[i] %>"><label for="<%= lev[i] %>"><%= lev[i] %></label><br>
+            <input type="checkbox" name="lev" value="<%= lev[i] %>"><label for="<%= lev[i] %>"><% if(lev[i]==50){ %><%= lev[i]+" Errors" %><% }else{ %><%= lev[i] %><% } %></label><br>
           <% } %>
           </ul>
         <% } %>

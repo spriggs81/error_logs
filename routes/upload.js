@@ -224,7 +224,7 @@ router.get('/data/page:number', function(req, res){
       var end = begin + numberPerPage;
       pageList = newArray.slice(begin, end);
       console.log("Page being served up at: "+serverTime());
-      res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type, comp:comp, hrs:hrs, mins:mins, lev:lev});
+      res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
   }
 });
 
@@ -387,7 +387,7 @@ router.get('/filter/page:number', function(req, res){
       var end = begin + numberPerPage;
       pageList = filteredData.slice(begin, end);
       console.log("Page being served up at: "+serverTime());
-      res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type, comp:comp, hrs:hrs, mins:mins, lev:lev});
+      res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
   }
 });
 
