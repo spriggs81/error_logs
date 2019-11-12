@@ -1,7 +1,6 @@
 function testMe(x){
   let drop = document.getElementById('dropdownMenuButton').value;
-  alert("This was clicked!");
-  console.log(drop);
+  alert(drop + " was clicked!");
 }
 // alert("This works still!")
 

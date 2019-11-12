@@ -24,11 +24,12 @@ function serverTime(){
 }
 
 let newArray = [],
-    top100   = [],
+    filteredData = [],
     type = [],
     comp = [],
     hrs = [],
     mins = [],
+    lev = [],
     done = true;
 
 
@@ -39,7 +40,6 @@ router.get("/", function(req, res){
 router.post("/upload", function(req, res){
   console.log("Upload started at: "+serverTime());
     newArray = [];
-    top100 = [];
   let info = req.files.datafile.tempFilePath
   let i = 1;
   let check = 1;
@@ -144,12 +144,13 @@ router.post("/upload", function(req, res){
     newArray.forEach(function(value){
       if (type.indexOf(value.type)==-1) type.push(value.type);
       if (comp.indexOf(value.component)==-1) comp.push(value.component);
+      if (lev.indexOf(value.level)==-1) lev.push(value.level);
       if (hrs.indexOf(value.time.slice(11,13))==-1) hrs.push(value.time.slice(11,13));
       if (mins.indexOf(value.time.slice(14,16))==-1) mins.push(value.time.slice(14,16));
     });
 
     function returning(){
-      return newArray, type, comp, hrs, mins
+      return newArray, type, comp, hrs, mins, lev
     }
     returning();
     if(done === true){
@@ -184,52 +185,212 @@ router.get('/data', function(req, res){
   res.redirect('/data/page1');
 });
 
-  router.get('/data/page:number', function(req, res){
-    const directory = 'tmp';
-    fs.readdir(directory, (err, files) => {
-      if (err) throw err;
+router.get('/data/page:number', function(req, res){
+  const directory = 'tmp';
+  fs.readdir(directory, (err, files) => {
+    if (err) throw err;
 
-      for (const file of files) {
-        fs.unlink( directory+"/"+file, function( err ) {
-            if ( err ) return console.log( err );
-        });
-      }
-    });
-    let page = req.params.number
-    page = Number(page);
-    let pageList = [];
-    let currentPage = page;
-    const numberPerPage = 500;
-    let numberOfPages = 1;
-    load();
-    function load(){
-      makeList()
-      loadList()
+    for (const file of files) {
+      fs.unlink( directory+"/"+file, function( err ) {
+          if ( err ) return console.log( err );
+      });
     }
-    function makeList() {
-        numberOfPages = getNumberOfPages();
-    }
+  });
+  let page = req.params.number
+  page = Number(page);
+  let pageList = [];
+  let currentPage = page;
+  const numberPerPage = 500;
+  let numberOfPages = 1;
+  load();
+  function load(){
+    makeList()
+    loadList()
+  }
+  function makeList() {
+      numberOfPages = getNumberOfPages();
+  }
 
-    function getNumberOfPages() {
-        return Math.ceil(newArray.length / numberPerPage);
-    }
+  function getNumberOfPages() {
+      return Math.ceil(newArray.length / numberPerPage);
+  }
 
-    function loadList() {
-      if(numberOfPages === 0 || isNaN(page) === true || page < 1 || page > numberOfPages || newArray.length <= 0 || !newArray || newArray === '' || newArray === []){
-        let total = newArray.length;
-        res.render('pages/error',{total:total});
-      }
-        var begin = ((currentPage - 1) * numberPerPage);
-        var end = begin + numberPerPage;
-        pageList = newArray.slice(begin, end);
-        console.log("Page being served up at: "+serverTime());
-        res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages});
+  function loadList() {
+    if(numberOfPages === 0 || isNaN(page) === true || page < 1 || page > numberOfPages || newArray.length <= 0 || !newArray || newArray === '' || newArray === []){
+      let total = newArray.length;
+      res.render('pages/error',{total:total});
     }
+      var begin = ((currentPage - 1) * numberPerPage);
+      var end = begin + numberPerPage;
+      pageList = newArray.slice(begin, end);
+      console.log("Page being served up at: "+serverTime());
+      res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type, comp:comp, hrs:hrs, mins:mins, lev:lev});
+  }
 });
 
 router.get('/filter', function(req, res){
-  res.render('pages/filter');
+
+  res.render('pages/filter',{type:type, comp:comp, hrs:hrs, mins:mins});
 })
+
+router.post('/filter', function(req,res){
+  filteredData = [];
+  let selectTypes = req.body.selectType || null,
+    selectComps = req.body.selectComp || null,
+    selectLevs  = req.body.selectLev || null,
+    selectHrs   = req.body.selectHrs || null,
+    selectMins  = req.body.selectMins || null;
+
+    function checkTypes(a){
+      let aa = [];
+      let b = ''
+
+      if(selectTypes !== null){
+        for(let main = 0; main < a.length; main++){
+          if(Array.isArray(selectTypes) === true){
+            for(let i = 0; i < selectTypes.length; i++){
+              if(a[main].type == selectTypes[i]){
+                aa.push(a[main]);
+              }
+            }
+          } else {
+            if(a[main].type == selectTypes){
+              aa.push(a[main]);
+            }
+          }
+        }
+        checkComps(aa);
+      } else {
+        checkComps(a);
+      }
+    }
+    function checkComps(a){
+      let aa = [];
+      if(selectComps !== null){
+        for(let main = 0; main < a.length; main++){
+          if(Array.isArray(selectComps) === true){
+            for(let i = 0; i < selectComps.length; i++){
+              if(a[main].component == selectComps[i]){
+                aa.push(a[main]);
+              }
+            }
+          } else {
+            if(a[main].component == selectComps){
+              aa.push(a[main]);
+            }
+          }
+        }
+        checkLevs(aa);
+      } else {
+        b = a;
+        checkLevs(b);
+      }
+    }
+    function checkLevs(a){
+      let aa = [];
+      if(selectLevs !== null){
+        for(let main = 0; main < a.length; main++){
+          if(Array.isArray(selectLevs) === true){
+            for(let i = 0; i < selectLevs.length; i++){
+              if(a[main].level == selectLevs[i]){
+                aa.push(a[main]);
+              }
+            }
+          } else {
+            if(a[main].level == selectLevs){
+              aa.push(a[main]);
+            }
+          }
+        }
+        checkHrs(aa);
+      } else {
+        checkHrs(a);
+      }
+    }
+    function checkHrs(a){
+      let aa = [];
+      if(selectHrs !== null){
+        for(let main = 0; main < a.length; main++){
+          if(Array.isArray(selectHrs) === true){
+            for(let i = 0; i < selectHrs.length; i++){
+              if(a[main].time.slice(11,13) == selectHrs[i]){
+                aa.push(a[main]);
+              }
+            }
+          } else {
+            if(a[main].time.slice(11,13) == selectHrs){
+              aa.push(a[main]);
+            }
+          }
+        }
+        checkMins(aa);
+      } else {
+        checkMins(a);
+      }
+    }
+    function checkMins(a){
+      let aa = [];
+      if(selectMins !== null){
+        for(let main = 0; main < a.length; main++){
+          if(Array.isArray(selectMins) === true){
+            for(let i = 0; i < selectMins.length; i++){
+              if(a[main].time.slice(14,16) == selectMins[i]){
+                aa.push(a[main]);
+              }
+            }
+          } else {
+            if(a[main].time.slice(14,16) == selectMins){
+              aa.push(a[main]);
+            }
+          }
+        }
+        filteredData = aa;
+      } else {
+        filteredData = a;
+      }
+      return filteredData
+    }
+  checkTypes(newArray);
+  function returning(){
+    return filteredData;
+  }
+
+  res.redirect("/filter/page1");
+})
+
+router.get('/filter/page:number', function(req, res){
+  let page = req.params.number
+  page = Number(page);
+  let pageList = [];
+  let currentPage = page;
+  const numberPerPage = 500;
+  let numberOfPages = 1;
+  load();
+  function load(){
+    makeList()
+    loadList()
+  }
+  function makeList() {
+      numberOfPages = getNumberOfPages();
+  }
+
+  function getNumberOfPages() {
+      return Math.ceil(filteredData.length / numberPerPage);
+  }
+
+  function loadList() {
+    if(numberOfPages === 0 || isNaN(page) === true || page < 1 || page > numberOfPages || filteredData.length <= 0 || !filteredData || filteredData === '' || filteredData === []){
+      let total = filteredData.length;
+      res.render('pages/error',{total:total});
+    }
+      var begin = ((currentPage - 1) * numberPerPage);
+      var end = begin + numberPerPage;
+      pageList = filteredData.slice(begin, end);
+      console.log("Page being served up at: "+serverTime());
+      res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type, comp:comp, hrs:hrs, mins:mins, lev:lev});
+  }
+});
+
 
 function startData(){
   done = false;
@@ -244,7 +405,13 @@ function dataDone(){
 function checkInfo(x){
   payload = ''
   let n = 0;
-  if(Object.is(x, String(x)) === true || typeof x === 'boolean' || Object.is(x, Number(x)) === true){
+  if(Object.is(x, String(x)) === true){
+    if (n > 0){
+      payload += ', "'+x+'"'
+    } else {
+      payload += '"'+x+'"'
+    }
+  } else if(typeof x === 'boolean' || Object.is(x, Number(x)) === true){
     if (n > 0){
       payload += ", "+x
     } else {

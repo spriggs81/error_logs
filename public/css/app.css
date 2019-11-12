@@ -1,12 +1,6 @@
 body{
   background-color: #212529;
 }
-.fulltab{
-  position: sticky;
-  top: 60px;
-  color: white;
-  margin-top: 60px;
-}
 .bye{
   display: none;
 }
@@ -28,4 +22,43 @@ body{
 .filtering{
   margin-top: 45px;
   border: 2px red solid;
+}
+
+#collapseExample input {
+  margin: 0;
+}
+
+.card-space{
+  width: 100%;
+  padding: 0;
+  border: 2px red solid;
+
+}
+
+.boxing{
+  box-sizing: inherit;
+}
+
+/* *, ::after, ::before {
+    box-sizing: inherit;
+} */
+
+ul.boxing{
+  padding-inline-start: 5px;
+  padding-right: 0;
+}
+
+main#list.col-16.col-md-9.col-xl-12.py-md-3.pl-md-5{
+  padding-left: 10px!important;
+}
+
+.pl-md-5, .px-md-5 {
+  padding-left: 0;
+}
+
+.fulltab{
+  position: sticky;
+  top: 60px;
+  color: white;
+  margin-top: 60px;
 }

@@ -1,20 +1,310 @@
 <% include ../partials/header %>
 
-<div class="fulltab">
-  <h1>This is the filter page</h1>
-</div>
-<div class="dropdown">
-  <select class="btn btn-secondary" id="dropdownMenuButton" onChange="testMe(value)">
-    <option value="" default>Please Select</option>
-    <option class="dropdown-item" href="#" value="actionInfo">Action</option>
-    <option class="dropdown-item" href="#" value="anoActionInfo">Another action</option>
-    <option class="dropdown-item" href="#" value="someInfo">Something else here</option>
-  </select>
-  <!-- <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"> -->
+  <div class="fulltab" style="text-align:center;">
 
-  <!-- </div> -->
-</div>
+    <input type="button" id="first" onclick="firstPage()" value="First" class="btn btn-dark" />
+    <input type="button" id="next" onclick="nextPage()" value="Next" class="btn btn-dark" />
+    <input type="button" id="previous" onclick="previousPage()" value="Previous" class="btn btn-dark" />
+    <input type="button" id="last" onclick="lastPage()" value="Last" class="btn btn-dark" />
+  </div>
+  <div class="row flex-xl-nowrap">
+    <div class="col-12 col-md-3 col-lg-2 bd-sidebar collapse" id="collapseExample1">
+      <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+        Types:
+      </a>
+      <div class="collapse boxing" id="collapseExample">
+        <div class="card card-body card-space">
+        <% if(type){ %>
+          <ul class="boxing boxing">
+          <% for(let i = 0; i < type.length; i++){ %>
+            <input type="checkbox" name="type" value="<%= type[i] %>"><label for="<%= type[i] %>"><%= type[i] %></label><br>
+          <% } %>
+          </ul>
+        <% } %>
+        </div>
+      </div><br>
+      <a data-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample2">
+        Components:
+      </a>
+      <div class="collapse" id="collapseExample2">
+        <div class="card card-body card-space">
+        <% if(comp){ %>
+          <ul class="boxing">
+          <% for(let i = 0; i < comp.length; i++){ %>
+            <input type="checkbox" name="comp" value="<%= comp[i] %>"><label for="<%= comp[i] %>"><%= comp[i] %></label><br>
+          <% } %>
+          </ul>
+        <% } %>
+        </div>
+      </div><br>
+      <a data-toggle="collapse" href="#collapseExample5" role="button" aria-expanded="false" aria-controls="collapseExample5">
+        Levels:
+      </a>
+      <div class="collapse" id="collapseExample5">
+        <div class="card card-body card-space boxing">
+        <% if(lev){ %>
+          <ul class="boxing">
+          <% for(let i = 0; i < lev.length; i++){ %>
+            <input type="checkbox" name="lev" value="<%= lev[i] %>"><label for="<%= lev[i] %>"><%= lev[i] %></label><br>
+          <% } %>
+          </ul>
+        <% } %>
+        </div>
+      </div><br>
+      <a data-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample3">
+        Hours:
+      </a>
+      <div class="collapse" id="collapseExample3">
+        <div class="card card-body card-space boxing">
+        <% if(hrs){ %>
+          <ul class="boxing">
+          <% for(let i = 0; i < hrs.length; i++){ %>
+            <input type="checkbox" name="hrs" value="<%= hrs[i] %>"><label for="<%= hrs[i] %>"><%= hrs[i]+"H" %></label> |
+          <% } %>
+          </ul>
+        <% } %>
+        </div>
+      </div><br>
+      <a data-toggle="collapse" href="#collapseExample4" role="button" aria-expanded="false" aria-controls="collapseExample4">
+        Minutes:
+      </a>
+      <div class="collapse" id="collapseExample4">
+        <div class="card card-body card-space">
+        <% if(mins){ %>
+          <ul class="boxing">
+          <% for(let i = 0; i < mins.length; i++){ %>
+            <input type="checkbox" name="mins" value="<%= mins[i] %>"><label for="<%= mins[i] %>"><%= mins[i]+"M" %></label> |
+          <% } %>
+          </ul>
+        <% } %>
+        </div>
+      </div><br>
+      <button type="button" name="button" onclick="createFilter()">Apply Filters</button>
+    </div>
+    <main id="list" class="col-16 col-md-9 col-xl-12 py-md-3 pl-md-5" role="main"></main>
+  </div>
+  <script type="text/javascript">
+    let list = <%-data %>;
+    let pageList = list;
+    let currentPage = <%= current %>;
+    let numberOfPages = <%= total %>;
+
+    function nextPage() {
+      currentPage += 1;
+      loadPage(currentPage);
+    }
+    function previousPage() {
+      currentPage -= 1;
+      loadPage(currentPage);
+    }
+    function firstPage() {
+      currentPage = 1;
+      loadPage(currentPage);
+    }
+    function lastPage() {
+      currentPage = numberOfPages;
+      loadPage(currentPage);
+    }
+    function loadPage(x){
+      location.href = '/data/page'+x
+    }
+    function loadList() {
+      drawList();
+      check();
+    }
+    function drawList() {
+      const head = '<table class="table table-striped table-dark"><thead><tr><th>#</th><th>Time:</th><th>Name:</th><th>Type:</th><th>Component:</th><th>Level:</th><th>Message: </th></tr></div></thead><tbody>';
+      nav = document.getElementById("navPlace");
+      nav1 = document.getElementById("navPlace1");
+      document.getElementById("current").innerHTML = "";
+      document.getElementById("list").innerHTML = "";
+      nav.innerHTML = "";
+      nav1.innerHTML = "";
+      document.getElementById("list").innerHTML += head;
+      document.getElementById("current").innerHTML = "Page: <%= current %> / <%= total %>";
+      document.getElementById("current").classList.add("navbar-nav","mr-auto");
+      // get the reference for the body
+      var body = document.getElementsByTagName('main')[0];
+      console.log(body);
+      // creates a <table> element and a <tbody> element
+      var tbl = document.getElementsByTagName("table")[0];
+      var tblBody = document.getElementsByTagName("tbody")[0];
+
+      // creating all cells
+      let r1 = '', r2 = '', r3 = '', r4 = '';
+      for (r = 0; r < pageList.length; r++) {
+        r1 = null, r2 = null, r3 = null, r4 = null
+        let obj = pageList[r];
+        // creates a table row
+        let row0 = document.createElement("tr");
+        let row1 = document.createElement("tr");
+        let row2 = document.createElement("tr");
+        let row3 = document.createElement("tr");
+        let row4 = document.createElement("tr");
+        // Create a <td> element and a text node, make the text
+        // node the contents of the <td>, and put the <td> at
+        // the end of the table row
+        let cell0 = document.createElement("td");
+        let cellText0 = document.createTextNode(obj.place);
+        let cell1 = document.createElement("td");
+        let cellText1 = document.createTextNode(obj.newTime)
+        let cell2 = document.createElement("td");
+        let cellText2 = document.createTextNode(obj.name);
+        let cell3 = document.createElement("td");
+        let cellText3 = document.createTextNode(obj.type)
+        let cell4 = document.createElement("td");
+        let cellText4 = document.createTextNode(obj.component);
+        let cell5 = document.createElement("td");
+        let cellText5 = document.createTextNode(obj.level)
+        let cell6 = document.createElement("td");
+        let cellText6 = document.createTextNode(obj.msg);
+        cell0.appendChild(cellText0);
+        row0.appendChild(cell0);
+        cell1.appendChild(cellText1);
+        row0.appendChild(cell1);
+        cell2.appendChild(cellText2);
+        row0.appendChild(cell2);
+        cell3.appendChild(cellText3);
+        row0.appendChild(cell3);
+        cell4.appendChild(cellText4);
+        row0.appendChild(cell4);
+        cell5.appendChild(cellText5);
+        row0.appendChild(cell5);
+        cell6.appendChild(cellText6);
+        row0.appendChild(cell6);
+        if(obj.payload){
+          var cell7 = document.createElement("td");
+          var cellText7 = document.createTextNode(obj.newPayload);
+          cell7.appendChild(cellText7);
+          cell7.setAttribute("colspan", "8");
+          row1.appendChild(cell7)
+          r1 = 1
+        }
+        if(obj.message){
+          var cell8 = document.createElement("td");
+          var cellText8 = document.createTextNode(obj.newMsg);
+          cell8.appendChild(cellText8);
+          cell8.setAttribute("colspan", "8");
+          row2.appendChild(cell8)
+          r2 = 1
+        }
+        if(obj.result){
+          var cell9 = document.createElement("td");
+          var cellText9 = document.createTextNode(obj.newResult);
+          cell9.appendChild(cellText9);
+          cell9.setAttribute("colspan", "8");
+          row3.appendChild(cell9)
+          r3 = 1
+        }
+        if(obj.sqlQuery){
+          var cell10 = document.createElement("td");
+          var cellText10 = document.createTextNode("SQL Query: "+obj.sqlQuery);
+          cell10.appendChild(cellText10);
+          cell10.setAttribute("colspan", "8");
+          row4.appendChild(cell10)
+          r4 = 1
+        }
+        // add the row to the end of the table body
+        tblBody.appendChild(row0);
+        if(r1 !== null){
+          tblBody.appendChild(row1)
+        }
+        if(r2 !== null){
+          tblBody.appendChild(row2)
+        }
+        if(r3 !== null){
+          tblBody.appendChild(row3)
+        }
+        if(r4 !== null){
+          tblBody.appendChild(row4)
+        }
+      }
+
+      // put the <tbody> in the <table>
+      tbl.appendChild(tblBody);
+      // appends <table> into <body>
+      body.appendChild(tbl);
+      // sets the border attribute of tbl to 2;
+      tbl.setAttribute("border", "2");
+
+      <% if(type.length > 0 || comp.length > 0 || lev.length > 0 || hrs.length > 0 || mins.length > 0){ %>
+        nav.innerHTML = '<li class="nav-item"><a class="nav-link" data-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">Filter</a></li>';
+        nav1.innerHTML = '<li class="nav-item"><a class="nav-link" href="/data/page1">Un-filter</a></li>'
+      <% } %>
+    }
+
+
+    function check() {
+      document.getElementById("next").disabled = currentPage == numberOfPages ? true : false;
+      document.getElementById("previous").disabled = currentPage == 1 ? true : false;
+      document.getElementById("first").disabled = currentPage == 1 ? true : false;
+      document.getElementById("last").disabled = currentPage == numberOfPages ? true : false;
+    }
+
+    function load() {
+      loadList();
+    }
+    window.onload = load;
+
+    function createFilter(){
+      let t = document.getElementsByName('type'),
+          c = document.getElementsByName('comp'),
+          l = document.getElementsByName('lev'),
+          h = document.getElementsByName('hrs'),
+          m = document.getElementsByName('mins');
+      let filterForm = document.createElement('form');
+          filterForm.name = 'myForm';
+          filterForm.method = 'POST';
+          filterForm.action = "/filter";
+      for(let i = 0; i < t.length; i++){
+        if(t[i].type == 'checkbox' && t[i].checked == true){
+          let tip = document.createElement('INPUT');
+          tip.type='TEXT';
+          tip.name='selectType';
+          tip.value=t[i].value;
+          filterForm.appendChild(tip);
+        }
+      }
+      for(let i = 0; i < c.length; i++){
+        if(c[i].type == 'checkbox' && c[i].checked == true){
+          let cip = document.createElement('INPUT');
+          cip.type='TEXT';
+          cip.name='selectComp';
+          cip.value=c[i].value;
+          filterForm.appendChild(cip);
+        }
+      }
+      for(let i = 0; i < l.length; i++){
+        if(l[i].type == 'checkbox' && l[i].checked == true){
+          let lip = document.createElement('INPUT');
+          lip.type='TEXT';
+          lip.name='selectLev';
+          lip.value=l[i].value;
+          filterForm.appendChild(lip);
+        }
+      }
+      for(let i = 0; i < h.length; i++){
+        if(h[i].type == 'checkbox' && h[i].checked == true){
+          let hip = document.createElement('INPUT');
+          hip.type='TEXT';
+          hip.name='selectHrs';
+          hip.value=h[i].value;
+          filterForm.appendChild(hip);
+        }
+      }
+      for(let i = 0; i < m.length; i++){
+        if(m[i].type == 'checkbox' && m[i].checked == true){
+          let mip = document.createElement('INPUT');
+          mip.type='TEXT';
+          mip.name='selectMins';
+          mip.value=m[i].value;
+          filterForm.appendChild(mip);
+        }
+      }
+      console.log(filterForm);
+      document.body.append(filterForm)
+      filterForm.submit()
+    }
+  </script>
 
 <% include ../partials/footer %>
-
-<%  %>
