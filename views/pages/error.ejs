@@ -1,7 +1,13 @@
-<% if(total <= 0){ %>
-  <h1>Well that's no fun, there's no more data in here!  Oh well, Back to step 1 you go!</h1>
-  <a href="/">Click Here (Enter New File)</a>
-<% } else { %>
-  <h1>Not sure how you made it here but let's go back to Page 1!</h1>
-  <a href="/data/page1">Click Here (Page1)</a>
-<% } %>
+<% include ../partials/header %>
+
+<div class="fulltab">
+  <% if(total <= 0){ %>
+    <h1>Well that's no fun, there's no more data in here!  Oh well, Back to step 1 you go!</h1>
+    <a href="/">Click Here (Enter New File)</a>
+  <% } else { %>
+    <h1>Not sure how you made it here but let's go back to Page 1!</h1>
+    <a href="/data/page1">Click Here (Page1)</a>
+  <% } %>
+</div>
+
+<% include ../partials/footer %>

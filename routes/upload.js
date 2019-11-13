@@ -1,6 +1,7 @@
 const fs = require('fs');
 const es = require('event-stream');
 const express = require('express');
+const sqlFormatter = require('sql-formatter');
 const router = express.Router({mergeParams: true});
 
 function serverTime(){
@@ -113,6 +114,7 @@ router.post("/upload", function(req, res){
       }
       if(newline.sqlQuery){
         newline.newSql = newline.sqlQuery.toString();
+        //console.log(sqlFormatter.format(newline.sqlQuery));
       }
       newline.place = i;
       let yy = newline.time.slice(0,4)
@@ -138,12 +140,12 @@ router.post("/upload", function(req, res){
     //slogMemoryUsage(lineNr);
 
     // resume the readstream, possibly from a callback
-    if(j == 50000){
-      setTimeout(function(){
+    if(j == 80000){
+      setInterval(function(){
         j = 1;
         s.resume();
         return j;
-      }, 5000);
+      }, 250);
     } else {
       s.resume();
     }
@@ -191,7 +193,7 @@ letSee(done);
     } else {
       setTimeout(function(){
         res.redirect('/loading')
-      }, 2000)
+      }, 5000)
     }
     m++
   }
@@ -203,14 +205,14 @@ router.get('/data', function(req, res){
 });
 
 router.get('/data/page:number', function(req, res){
-  const directory = ['./tmp','/tmp'];
-  for(let i= 0; i < directory.length; i++){
-    fs.readdir(directory[i], (err, files) => {
+  const directory = '/tmp'//['./tmp','/tmp'];
+  // for(let i= 0; i < directory.length; i++){
+    fs.readdir(directory, (err, files) => {
       if (err) throw err;
       // if(files){
       if(files.length > 0){
         for (const file of files) {
-          fs.unlink( directory[i]+"/"+file, function( err ) {
+          fs.unlink( directory+"/"+file, function( err ) {
               if ( err ) return console.log( err );
           });
         }
@@ -219,7 +221,7 @@ router.get('/data/page:number', function(req, res){
       // }
 
     });
-  }
+  // }
 
   let page = req.params.number
   page = Number(page);
@@ -252,11 +254,6 @@ router.get('/data/page:number', function(req, res){
       res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
   }
 });
-
-router.get('/filter', function(req, res){
-
-  res.render('pages/filter',{type:type, comp:comp, hrs:hrs, mins:mins});
-})
 
 router.post('/filter', function(req,res){
   filteredData = [];
@@ -417,6 +414,11 @@ router.get('/filter/page:number', function(req, res){
 });
 
 
+router.get('/*',function(req, res){
+  let total = newArray.length;
+  res.render('pages/error',{total:total});
+})
+
 function startData(){
   done = false;
   return done;
@@ -447,7 +449,8 @@ function checkInfo(x){
     let a = 0;
     for(let ii = 0; ii < x.length; ii++){
       if(x[ii] === null || x[ii] === ''){
-        x[ii] = "null"
+        //x[ii] = "null"
+        x[ii] = String(x[ii])
       }
       if(a > 0){
         payload += ", " + checkInfo(x[ii]);
@@ -463,7 +466,8 @@ function checkInfo(x){
     for (const key of Object.keys(x)) {
       let val = x[key]
       if(val === null || val === ''){
-        val = "null";
+        //val = "null";
+        val = String(val)
       }
       if(a > 0){
         payload += ", "+key+": "+ checkInfo(val)

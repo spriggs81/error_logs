@@ -5,8 +5,8 @@ const fileUpload = require('express-fileupload');
 const route = require('./routes/upload')
 const app = express();
 
-let port = process.env.PORT,// || 411,
-    ip = process.env.IP;// || 'localhost';
+let port = process.env.PORT || 411,
+    ip = process.env.IP || 'localhost';
 
     var dir = '/tmp';
 
@@ -16,7 +16,7 @@ let port = process.env.PORT,// || 411,
 
 app.use(fileUpload({
   useTempFiles: true,
-  temoFileDir: '/tmp'
+  temoFileDir: 'c:/nodeapps/errorLogs/tmp'
 }));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
