@@ -6,7 +6,7 @@ const route = require('./routes/upload')
 const app = express();
 
 let port = process.env.PORT,// || 411,
-    ip = process.env.IP,// || 'localhost';
+    ip = process.env.IP;// || 'localhost';
 
     var dir = '/tmp';
 
