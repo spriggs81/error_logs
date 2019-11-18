@@ -82,6 +82,29 @@
     </div>
     <div id="list" class="col-16 col-md-9 col-xl-12 py-md-3 pl-md-5" role="main"></div>
   </div>
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Custom Search</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="customForm" action="/custom" method="post">
+          <div class="form-group">
+            <label for="modalField">Please enter a word, string, or number(s) to search the areas of the logs that are storing data</label>
+            <textarea name="selectCustom" class="form-control" id="modalField" rows="3" placeholder="This will search for a word or a string of words, but has not been setup to handle multiple words or multiple strings of words... COMING SOON..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="sendThis()">Run Search</button>
+      </div>
+    </div>
+  </div>
   <script type="text/javascript">
     let list = <%-data %>;
     let pageList = list;
@@ -114,9 +137,11 @@
     function drawList() {
       const head = '<table class="table table-striped table-dark"><thead><tr><th>#</th><th>Time:</th><th>Name:</th><th>Type:</th><th>Component:</th><th>Level:</th><th>Message: </th></tr></div></thead><tbody>';
       nav = document.getElementById("navPlace");
+      nav1 = document.getElementById("navPlace1");
       document.getElementById("current").innerHTML = "";
       document.getElementById("list").innerHTML = "";
       nav.innerHTML = "";
+      nav1.innerHTML = "";
       document.getElementById("list").innerHTML += head;
       document.getElementById("current").innerHTML = "Page: <%= current %> / <%= total %>";
       document.getElementById("current").classList.add("navbar-nav","mr-auto");
@@ -130,7 +155,7 @@
       // creating all cells
       let r1 = '', r2 = '', r3 = '', r4 = '';
       for (r = 0; r < pageList.length; r++) {
-        r1 = null, r2 = null, r3 = null, r4 = null
+        r1 = null, r2 = null, r3 = null, r4 = null, r5 = null
         let obj = pageList[r];
         // creates a table row
         let row0 = document.createElement("tr");
@@ -138,6 +163,7 @@
         let row2 = document.createElement("tr");
         let row3 = document.createElement("tr");
         let row4 = document.createElement("tr");
+        let row5 = document.createElement("tr");
         // Create a <td> element and a text node, make the text
         // node the contents of the <td>, and put the <td> at
         // the end of the table row
@@ -201,6 +227,14 @@
           row4.appendChild(cell10)
           r4 = 1
         }
+        if(obj.newErr){
+          var cell11 = document.createElement("td");
+          var cellText11 = document.createTextNode(obj.newErr);
+          cell11.appendChild(cellText11);
+          cell11.setAttribute("colspan", "8");
+          row5.appendChild(cell11)
+          r5 = 1
+        }
         // add the row to the end of the table body
         tblBody.appendChild(row0);
         if(r1 !== null){
@@ -215,6 +249,9 @@
         if(r4 !== null){
           tblBody.appendChild(row4)
         }
+        if(r5 !== null){
+          tblBody.appendChild(row5)
+        }
       }
 
       // put the <tbody> in the <table>
@@ -226,6 +263,7 @@
 
       <% if(type.length > 0 || comp.length > 0 || lev.length > 0 || hrs.length > 0 || mins.length > 0){ %>
         nav.innerHTML = '<li class="nav-item"><a class="nav-link" data-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">Filter</a></li>';
+        nav1.innerHTML = '<li class="nav-item"><a class="nav-link" data-toggle="modal" href="#exampleModalCenter" role="button">Custom Search</a></li>';
       <% } %>
     }
 
@@ -300,6 +338,13 @@
       console.log(filterForm);
       document.body.append(filterForm)
       filterForm.submit()
+    }
+
+    function sendThis(){
+      let x = document.getElementById('customForm');
+      let d = document.getElementById('modalField');
+      x.appendChild(d);
+      x.submit();
     }
   </script>
 

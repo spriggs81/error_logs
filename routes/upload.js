@@ -26,6 +26,7 @@ function serverTime(){
 
 let newArray = [],
     filteredData = [],
+    customData = [],
     type = [],
     comp = [],
     hrs = [],
@@ -39,17 +40,12 @@ router.get("/", function(req, res){
 })
 
 router.post("/upload", function(req, res){
-  // console.log("Upload started at: "+serverTime());
-    newArray = [];
+  newArray = [];
   let info = req.files.datafile.tempFilePath
   let i = 1;
   let j = 1;
   let check = 1;
   let newline = '';
-
-  if(req.files === ''){
-    res.redirect('/data/page1');
-  }
 
   function checkPayload(name, data){
     let payload = '',
@@ -62,6 +58,9 @@ router.post("/upload", function(req, res){
       }
       if(name === "result"){
         x = "Result"
+      }
+      if(name === "err"){
+        x = "Error"
       }
     if(data === null || data === ''){
       data = "null"
@@ -81,7 +80,10 @@ router.post("/upload", function(req, res){
         newline.newResult = payload
         return newline.newResult
       }
-
+      if(name === "err"){
+        newline.newErr = payload
+        return newline.newErr
+      }
     }
   }
   const s = fs.createReadStream(info)
@@ -90,18 +92,10 @@ router.post("/upload", function(req, res){
 
     // pause the readstream
     s.pause();
-    // if(j == 100000){
-    //   setTimeout(function(){
-    //     j = 1;
-    //     // console.log("break: "+serverTime());
-    //     return j;
-    //   }, 5000);
-    // }
-    //lineNr += 1;
 
     // process line here and call s.resume() when rdy
-    let checkLine = line.slice(0,7);
-    if(checkLine == '{"name"'){
+    let checkLine = line.slice(0,2);
+    if(checkLine == '{"'){
       newline = JSON.parse(line);
       if(newline.payload){
         checkPayload("pay", newline.payload);
@@ -112,9 +106,11 @@ router.post("/upload", function(req, res){
       if(newline.result){
         checkPayload("result", newline.result);
       }
+      if(newline.err){
+        checkPayload("err", newline.err);
+      }
       if(newline.sqlQuery){
         newline.newSql = newline.sqlQuery.toString();
-        //console.log(sqlFormatter.format(newline.sqlQuery));
       }
       newline.place = i;
       let yy = newline.time.slice(0,4)
@@ -130,14 +126,8 @@ router.post("/upload", function(req, res){
       i++
     }
 
-
-    // if(newline.place === 5000){
-    //   startData();
-    //   res.redirect("/loading");
-    // }
     check++
     // function below was for logging memory usage
-    //slogMemoryUsage(lineNr);
 
     // resume the readstream, possibly from a callback
     if(j == 80000){
@@ -145,14 +135,17 @@ router.post("/upload", function(req, res){
         j = 1;
         s.resume();
         return j;
-      }, 250);
+      }, 500);
     } else {
       s.resume();
     }
     j++
   })
   .on('error', function(err){
-    console.log('Error while reading file.', err);
+    setTimeout(function(){
+      res.redirect('/');
+    }, 3000)
+    res.send('Error while reading file. ' + err + " Please note this page will redirect in 3 seconds.");
   })
   .on('end', function(){
     type = [];
@@ -167,13 +160,12 @@ router.post("/upload", function(req, res){
       if (hrs.indexOf(value.time.slice(11,13))==-1) hrs.push(value.time.slice(11,13));
       if (mins.indexOf(value.time.slice(14,16))==-1) mins.push(value.time.slice(14,16));
     });
-
     function returning(){
       return newArray, type, comp, hrs, mins, lev
     }
     returning();
     if(done === true){
-      res.redirect('/data/page1')
+      res.redirect('/data/page1');
     }
     if(done === false){
       dataDone();
@@ -192,24 +184,20 @@ letSee(done);
       res.redirect('/data/page1');
     } else {
       setTimeout(function(){
-        res.redirect('/loading')
+        res.redirect('/loading');
       }, 5000)
     }
     m++
   }
 })
 
-router.get('/data', function(req, res){
-  let total = newArray.length;
-  res.redirect('/data/page1');
-});
-
 router.get('/data/page:number', function(req, res){
-  const directory = '/tmp'//['./tmp','/tmp'];
-  // for(let i= 0; i < directory.length; i++){
+  const directory = '/tmp'
     fs.readdir(directory, (err, files) => {
-      if (err) throw err;
-      // if(files){
+      if (err){
+        console.log(err);
+        res.redirect('/')
+      };
       if(files.length > 0){
         for (const file of files) {
           fs.unlink( directory+"/"+file, function( err ) {
@@ -217,12 +205,7 @@ router.get('/data/page:number', function(req, res){
           });
         }
       }
-
-      // }
-
     });
-  // }
-
   let page = req.params.number
   page = Number(page);
   let pageList = [];
@@ -246,22 +229,22 @@ router.get('/data/page:number', function(req, res){
     if(numberOfPages === 0 || isNaN(page) === true || page < 1 || page > numberOfPages || newArray.length <= 0 || !newArray || newArray === '' || newArray === []){
       let total = newArray.length;
       res.render('pages/error',{total:total});
-    }
+    } else {
       var begin = ((currentPage - 1) * numberPerPage);
       var end = begin + numberPerPage;
       pageList = newArray.slice(begin, end);
-      // console.log("Page being served up at: "+serverTime());
       res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
+    }
   }
 });
 
 router.post('/filter', function(req,res){
   filteredData = [];
   let selectTypes = req.body.selectType || null,
-    selectComps = req.body.selectComp || null,
-    selectLevs  = req.body.selectLev || null,
-    selectHrs   = req.body.selectHrs || null,
-    selectMins  = req.body.selectMins || null;
+      selectComps = req.body.selectComp || null,
+      selectLevs = req.body.selectLev || null,
+      selectHrs = req.body.selectHrs || null,
+      selectMins = req.body.selectMins || null;
 
     function checkTypes(a){
       let aa = [];
@@ -373,10 +356,6 @@ router.post('/filter', function(req,res){
       return filteredData
     }
   checkTypes(newArray);
-  function returning(){
-    return filteredData;
-  }
-
   res.redirect("/filter/page1");
 })
 
@@ -404,15 +383,156 @@ router.get('/filter/page:number', function(req, res){
     if(numberOfPages === 0 || isNaN(page) === true || page < 1 || page > numberOfPages || filteredData.length <= 0 || !filteredData || filteredData === '' || filteredData === []){
       let total = filteredData.length;
       res.render('pages/error',{total:total});
-    }
+    } else {
       var begin = ((currentPage - 1) * numberPerPage);
       var end = begin + numberPerPage;
       pageList = filteredData.slice(begin, end);
-      // console.log("Page being served up at: "+serverTime());
       res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
+    }
   }
 });
 
+router.post('/custom', function(req, res){
+  let customSearch = String(req.body.selectCustom).toLowerCase();
+  customData = [];
+    function searchingNow(a){
+      let aa = [],
+          bb = [... a];
+
+      for(let i = 0; i < bb.length; i++){
+        function checkingE(){
+          if(bb[i].newErr){
+            if(bb[i].newErr.toLowerCase().search(customSearch) !== -1){
+              aa.push(bb[i]);
+              bb.splice(i,1);
+              i--;
+            } else {
+              //send to next function
+              checkingQ();
+            }
+          } else {
+            //Send to next function
+            checkingQ();
+          }
+        }
+
+        function checkingQ(){
+          if(bb[i].sqlQuery){
+            if(bb[i].sqlQuery.toLowerCase().search(customSearch) !== -1){
+              aa.push(bb[i]);
+              bb.splice(i,1);
+              i--;
+            } else {
+              //send to next function
+              checkingNm();
+            }
+          } else {
+            //Send to next function
+            checkingNm();
+          }
+        }
+
+        function checkingNm(){
+          if(bb[i].newMsg){
+            if(bb[i].newMsg.toLowerCase().search(customSearch) !== -1){
+              aa.push(bb[i]);
+              bb.splice(i,1);
+              i--;
+            } else {
+              //send to next function
+              checkingNr();
+            }
+          } else {
+            //send to next function
+            checkingNr();
+          }
+        }
+
+        function checkingNr(){
+          if(bb[i].result){
+            if(bb[i].newResult.toLowerCase().search(customSearch) !== -1){
+              aa.push(bb[i]);
+              bb.splice(i,1);
+              i--;
+            } else {
+              checkingNp();
+            }
+          } else {
+            checkingNp();
+          }
+        }
+
+        function checkingNp(){
+          if(bb[i] .newPayload){
+            if(bb[i].newPayload.toLowerCase().search(customSearch) !== -1){
+              aa.push(bb[i]);
+              bb.splice(i,1);
+              i--;
+            } else {
+              checkingM();
+            }
+          } else {
+            checkingM();
+          }
+        }
+
+        function checkingM(){
+          if(bb[i].message){
+            let mess = String(bb[i].message).toLowerCase()
+            if(mess.search(customSearch) !== -1){
+              aa.push(bb[i]);
+              bb.splice(i,1);
+              i--;
+            }
+          }
+        }
+        checkingE();
+      }
+      customData = [... aa];
+      return customData;
+    }
+  searchingNow(newArray);
+  if(customData.length <= 0){
+    res.send("Your Search Returned Nothing <a href='/data/page1'>Go Back to the Data!</a>");
+  } else {
+    res.redirect("/custom/page1");
+  }
+})
+
+router.get('/custom/page:number', function(req,res){
+  let page = req.params.number
+  page = Number(page);
+  let pageList = [];
+  let currentPage = page;
+  const numberPerPage = 500;
+  let numberOfPages = 1;
+  load();
+  function load(){
+    makeList()
+    loadList()
+  }
+  function makeList() {
+      numberOfPages = getNumberOfPages();
+  }
+
+  function getNumberOfPages() {
+      return Math.ceil(customData.length / numberPerPage);
+  }
+
+  function loadList() {
+    if(numberOfPages === 0 || isNaN(page) === true || page < 1 || page > numberOfPages){
+        let total = customData.length;
+        res.render('pages/error',{total:total});
+    } else if(customData.length <= 0 || !customData || customData === '' || customData === []){
+      res.redirect('/data/page1')
+    } else {
+      var begin = ((currentPage - 1) * numberPerPage);
+      var end = begin + numberPerPage;
+      pageList = customData.slice(begin, end);
+      res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
+    }
+  }
+})
 
 router.get('/*',function(req, res){
   let total = newArray.length;
@@ -449,7 +569,6 @@ function checkInfo(x){
     let a = 0;
     for(let ii = 0; ii < x.length; ii++){
       if(x[ii] === null || x[ii] === ''){
-        //x[ii] = "null"
         x[ii] = String(x[ii])
       }
       if(a > 0){
@@ -466,7 +585,6 @@ function checkInfo(x){
     for (const key of Object.keys(x)) {
       let val = x[key]
       if(val === null || val === ''){
-        //val = "null";
         val = String(val)
       }
       if(a > 0){
@@ -480,7 +598,5 @@ function checkInfo(x){
 }
 return payload
 }
-
-
 
 module.exports = router;
