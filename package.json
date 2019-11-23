@@ -1,10 +1,10 @@
 {
   "name": "errorLogs",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node --max-old-space-size=4096 app.js"
   },
   "keywords": [],
   "author": "John Spriggs",
