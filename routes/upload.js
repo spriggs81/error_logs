@@ -221,12 +221,13 @@ router.get('/data/page:number', (req, res) =>{
       if (err){
         console.log(err);
         res.redirect('/')
-      };
-      if(files.length > 0){
-        for (const file of files) {
-          fs.unlink( directory+"/"+file, function( err ) {
-              if ( err ) return console.log( err );
-          });
+      } else {
+        if(files.length > 0){
+          for (const file of files) {
+            fs.unlink( directory+"/"+file, function( err ) {
+                if ( err ) return console.log( err );
+            });
+          }
         }
       }
     });
