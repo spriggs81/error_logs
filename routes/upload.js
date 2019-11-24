@@ -217,6 +217,9 @@ router.get('/data/page:number', (req, res) =>{
   }
 
   const directory = './tmp'
+  if (!fs.existsSync(directory)){
+      fs.mkdirSync(directory);
+  }
     fs.readdir(directory, (err, files) => {
       if (err){
         console.log(err);
