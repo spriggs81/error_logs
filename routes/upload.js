@@ -4,7 +4,27 @@ const express = require('express');
 const sqlFormatter = require('sql-formatter');
 const router = express.Router({mergeParams: true});
 
-function serverTime(){
+const checkSize = (x) =>{
+  const b = x;
+  if(b >= 1000){
+    const kb = b / 1000;
+    if(kb >= 1000){
+      const mb = kb / 1000;
+      if(mb >= 1000){
+        const gb = mb / 1000;
+        return gb+" Gigabytes file!"
+      } else {
+        return mb+" Megabytes file!"
+      }
+    }  else {
+      return kb+" Kilobytes file!"
+    }
+  } else {
+    return b+" Bytes file!"
+  }
+}
+
+const serverTime = () =>{
   const now = new Date();
   const yy = now.getFullYear();
   const mm = now.getMonth();
@@ -14,7 +34,7 @@ function serverTime(){
   const ss = now.getSeconds();
   const ms = now.getMilliseconds();
 
-  function checkZero(x){
+  const checkZero = (x) =>{
     const xx = x.toString();
     if(xx.length == 1){
       return "0" + x.toString();
@@ -35,12 +55,22 @@ let newArray = [],
     lev = [],
     done = true;
 
-    function addData(x){
-
+    const addData = (x) =>{
       rawArray.push(JSON.parse(x))
     }
 
-router.get("/", function(req, res){
+    const addFailed = (x) =>{
+      const failedLine = {
+        name: "Failure",
+        type: "Failure",
+        component: "Failure",
+        level: "Special",
+        msg: String(x),
+        time: "0000-00-00T00:00:00.000Z"
+      }
+      rawArray.push(failedLine);
+    }
+router.get("/", (req, res) =>{
   newArray = [],
   rawArray = [],
   filteredData = [],
@@ -53,45 +83,43 @@ router.get("/", function(req, res){
   res.render("pages/home");
 })
 
-router.post("/upload", function(req, res){
+router.post("/upload",(req, res) =>{
+  console.log("Upload started at: "+serverTime());
+  console.log(checkSize(req.files.datafile.size));
   rawArray = [];
   let info = req.files.datafile.tempFilePath
   let i = 1;
   let j = 1;
   let check = 1;
   let newline = '';
-
   const s = fs.createReadStream(info)
   .pipe(es.split())
-  .pipe(es.mapSync(function(line){
+  .pipe(es.mapSync((line) =>{
 
     // pause the readstream
     s.pause();
 
     // process line here and call s.resume() when rdy
     let checkLine = line.slice(0,2);
-    let checkLine2 = line.slice(0,7);
+    let checkLine2 = line.slice(0,8);
     if(checkLine == '{"'){
-      // newline = JSON.parse(line);
-      // rawArray.push(newline);
-      addData(line);
+      const data = line;
+      addData(data);
+
     }
-    //console.log(checkLine2);
-    if(checkLine2 == 'failure:'){
-      console.log(line);
+    if(checkLine2 == 'Failure:'){
+      addFailed(line);
     }
 
     check++
       s.resume();
     // }
   })
-  .on('error', function(err){
-    setTimeout(function(){
-      res.redirect('/');
-    }, 3000)
-    res.send('Error while reading file. ' + err + " Please note this page will redirect in 3 seconds.");
+  .on('error', (err) =>{
+    res.send('Error while reading file. ' + err + "<br> <a href='/'>Start Over!</a>");
+    return
   })
-  .on('end', function(){
+  .on('end', () =>{
     if(done === true){
       res.redirect('/data/page1');
     }
@@ -101,32 +129,16 @@ router.post("/upload", function(req, res){
   })
 )
 });
-let m = 1
 
-router.get('/loading', function(req, res){
-letSee(done);
+router.get('/data/page:number', (req, res) =>{
 
-  function letSee(x){
-    if(x == true){
-      m = 0;
-      res.redirect('/data/page1');
-    } else {
-      setTimeout(function(){
-        res.redirect('/loading');
-      }, 5000)
-    }
-    m++
-  }
-})
-
-router.get('/data/page:number', function(req, res){
   type = [];
   comp = [];
   lev = [];
   hrs = [];
   mins = [];
 
-  function checkPayload(name, data){
+  const checkPayload = (name, data) =>{
     let payload = '',
         x       = '';
       if(name === 'pay'){
@@ -161,48 +173,50 @@ router.get('/data/page:number', function(req, res){
       }
     }
   }
+  if(newArray.length <= 0){
+    for(let i = 0; i < rawArray.length; i++){
+      if(rawArray[i].payload){
+        rawArray[i].newPayload = checkPayload("pay", rawArray[i].payload);
+      }
+      if(rawArray[i].message){
+        rawArray[i].newMsg = checkPayload("msg", rawArray[i].message);
+      }
+      if(rawArray[i].result){
+        rawArray[i].newResult = checkPayload("result", rawArray[i].result);
+      }
+      if(rawArray[i].err){
+        rawArray[i].newErr = checkPayload("err", rawArray[i].err);
+      }
+      if(rawArray[i].sqlQuery){
+        rawArray[i].newSql = rawArray[i].sqlQuery.toString();
+      }
+      rawArray[i].place = i + 1;
+      let yy = rawArray[i].time.slice(0,4)
+      let mm = rawArray[i].time.slice(5,7)
+      let dd = rawArray[i].time.slice(8,10)
+      let hr = rawArray[i].time.slice(11,13)
+      let min = rawArray[i].time.slice(14,16)
+      let ss = rawArray[i].time.slice(17,19)
+      let ms = rawArray[i].time.slice(20,23)
+      let newTime = mm + '/' + dd + '/' + yy + ' '+ hr + ':' + min + ":" + ss + "." + ms
+      rawArray[i].newTime = newTime;
+      newArray.push(rawArray[i])
+    }
+    rawArray.forEach((value) =>{
+      if (type.indexOf(value.type)==-1) type.push(value.type);
+      if (comp.indexOf(value.component)==-1) comp.push(value.component);
+      if (lev.indexOf(value.level)==-1) lev.push(value.level);
+      if (hrs.indexOf(value.time.slice(11,13))==-1) hrs.push(value.time.slice(11,13));
+      if (mins.indexOf(value.time.slice(14,16))==-1) mins.push(value.time.slice(14,16));
 
-  for(let i = 0; i < rawArray.length; i++){
-    if(rawArray[i].payload){
-      rawArray[i].newPayload = checkPayload("pay", rawArray[i].payload);
+    });
+    const returning = () =>{
+      return newArray, type, comp, hrs, mins, lev
     }
-    if(rawArray[i].message){
-      rawArray[i].newMsg = checkPayload("msg", rawArray[i].message);
-    }
-    if(rawArray[i].result){
-      rawArray[i].newResult = checkPayload("result", rawArray[i].result);
-    }
-    if(rawArray[i].err){
-      rawArray[i].newErr = checkPayload("err", rawArray[i].err);
-    }
-    if(rawArray[i].sqlQuery){
-      rawArray[i].newSql = rawArray[i].sqlQuery.toString();
-    }
-    rawArray[i].place = i + 1;
-    let yy = rawArray[i].time.slice(0,4)
-    let mm = rawArray[i].time.slice(5,7)
-    let dd = rawArray[i].time.slice(8,10)
-    let hr = rawArray[i].time.slice(11,13)
-    let min = rawArray[i].time.slice(14,16)
-    let ss = rawArray[i].time.slice(17,19)
-    let ms = rawArray[i].time.slice(20,23)
-    let newTime = mm + '/' + dd + '/' + yy + ' '+ hr + ':' + min + ":" + ss + "." + ms
-    rawArray[i].newTime = newTime;
-    newArray.push(rawArray[i])
+    returning();
   }
-  rawArray.forEach(function(value){
-    if (type.indexOf(value.type)==-1) type.push(value.type);
-    if (comp.indexOf(value.component)==-1) comp.push(value.component);
-    if (lev.indexOf(value.level)==-1) lev.push(value.level);
-    if (hrs.indexOf(value.time.slice(11,13))==-1) hrs.push(value.time.slice(11,13));
-    if (mins.indexOf(value.time.slice(14,16))==-1) mins.push(value.time.slice(14,16));
 
-  });
-  function returning(){
-    return newArray, type, comp, hrs, mins, lev
-  }
-  returning();
-  const directory = '/tmp'
+  const directory = './tmp'
     fs.readdir(directory, (err, files) => {
       if (err){
         console.log(err);
@@ -227,7 +241,7 @@ router.get('/data/page:number', function(req, res){
     makeList()
     loadList()
   }
-  function makeList() {
+   function makeList(){
       numberOfPages = getNumberOfPages();
   }
 
@@ -237,13 +251,16 @@ router.get('/data/page:number', function(req, res){
 
   function loadList() {
     if(numberOfPages === 0 || isNaN(page) === true || page < 1 || page > numberOfPages || newArray.length <= 0 || !newArray || newArray === '' || newArray === []){
+      console.log("Serving up errors at: "+serverTime());
       let total = newArray.length;
       res.render('pages/error',{total:total});
     } else {
+      console.log("Serving up Data page at: "+serverTime());
       var begin = ((currentPage - 1) * numberPerPage);
       var end = begin + numberPerPage;
       pageList = newArray.slice(begin, end);
-      res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
+      console.log(newArray.length);
+      res.render('pages/show',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort(), rows:newArray.length});
     }
   }
 });
@@ -397,7 +414,7 @@ router.get('/filter/page:number', function(req, res){
       var begin = ((currentPage - 1) * numberPerPage);
       var end = begin + numberPerPage;
       pageList = filteredData.slice(begin, end);
-      res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
+      res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort(), rows:filteredData.length});
     }
   }
 });
@@ -539,7 +556,7 @@ router.get('/custom/page:number', function(req,res){
       var begin = ((currentPage - 1) * numberPerPage);
       var end = begin + numberPerPage;
       pageList = customData.slice(begin, end);
-      res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort()});
+      res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort(), rows:customData.length});
     }
   }
 })
@@ -607,6 +624,10 @@ function checkInfo(x){
     payload += "}"
 }
 return payload
+}
+
+function resetAll(){
+
 }
 
 module.exports = router;

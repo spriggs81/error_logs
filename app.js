@@ -16,7 +16,7 @@ let port = process.env.PORT,// || 411,
 
 app.use(fileUpload({
   useTempFiles: true,
-  temoFileDir: '/tmp'
+  tempFileDir: '/tmp'
 }));
 app.set("view engine", "ejs");
 app.use(express.static("public"));

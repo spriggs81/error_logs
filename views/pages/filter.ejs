@@ -142,6 +142,7 @@
       nav2 = document.getElementById("navPlace2");
       document.getElementById("current").innerHTML = "";
       document.getElementById("list").innerHTML = "";
+      document.getElementById("totalRows").innerHTML = "Total Rows: <%= rows %>"
       nav.innerHTML = "";
       nav1.innerHTML = "";
       nav2.innerHTML = "";
@@ -150,7 +151,6 @@
       document.getElementById("current").classList.add("navbar-nav","mr-auto");
       // get the reference for the body
       var body = document.getElementsByTagName('main')[0];
-      console.log();
       // creates a <table> element and a <tbody> element
       var tbl = document.getElementsByTagName("table")[0];
       var tblBody = document.getElementsByTagName("tbody")[0];

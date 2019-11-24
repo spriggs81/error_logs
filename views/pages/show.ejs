@@ -138,6 +138,7 @@
       const head = '<table class="table table-striped table-dark"><thead><tr><th>#</th><th>Time:</th><th>Name:</th><th>Type:</th><th>Component:</th><th>Level:</th><th>Message: </th></tr></div></thead><tbody>';
       nav = document.getElementById("navPlace");
       nav1 = document.getElementById("navPlace1");
+      document.getElementById("totalRows").innerHTML = "Total Rows: <%= rows %>"
       document.getElementById("current").innerHTML = "";
       document.getElementById("list").innerHTML = "";
       nav.innerHTML = "";
@@ -196,40 +197,41 @@
         cell6.appendChild(cellText6);
         row0.appendChild(cell6);
         if(obj.payload){
-          var cell7 = document.createElement("td");
-          var cellText7 = document.createTextNode(obj.newPayload);
+          let cell7 = document.createElement("td");
+          let cellText7 = document.createTextNode(obj.newPayload);
+          
           cell7.appendChild(cellText7);
           cell7.setAttribute("colspan", "8");
           row1.appendChild(cell7)
           r1 = 1
         }
         if(obj.message){
-          var cell8 = document.createElement("td");
-          var cellText8 = document.createTextNode(obj.newMsg);
+          let cell8 = document.createElement("td");
+          let cellText8 = document.createTextNode(obj.newMsg);
           cell8.appendChild(cellText8);
           cell8.setAttribute("colspan", "8");
           row2.appendChild(cell8)
           r2 = 1
         }
         if(obj.result){
-          var cell9 = document.createElement("td");
-          var cellText9 = document.createTextNode(obj.newResult);
+          let cell9 = document.createElement("td");
+          let cellText9 = document.createTextNode(obj.newResult);
           cell9.appendChild(cellText9);
           cell9.setAttribute("colspan", "8");
           row3.appendChild(cell9)
           r3 = 1
         }
         if(obj.newSql){
-          var cell10 = document.createElement("td");
-          var cellText10 = document.createTextNode("SQL Query: "+obj.newSql);
+          let cell10 = document.createElement("td");
+          let cellText10 = document.createTextNode("SQL Query: "+obj.newSql);
           cell10.appendChild(cellText10);
           cell10.setAttribute("colspan", "8");
           row4.appendChild(cell10)
           r4 = 1
         }
         if(obj.newErr){
-          var cell11 = document.createElement("td");
-          var cellText11 = document.createTextNode(obj.newErr);
+          let cell11 = document.createElement("td");
+          let cellText11 = document.createTextNode(obj.newErr);
           cell11.appendChild(cellText11);
           cell11.setAttribute("colspan", "8");
           row5.appendChild(cell11)
