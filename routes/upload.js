@@ -4,6 +4,8 @@ const express = require('express');
 const sqlFormatter = require('sql-formatter');
 const router = express.Router({mergeParams: true});
 
+let debug_mode = false;
+
 const checkSize = (x) =>{
   const b = x;
   if(b >= 1000){
@@ -71,6 +73,9 @@ let newArray = [],
       rawArray.push(failedLine);
     }
 router.get("/", (req, res) =>{
+  if(debug_mode === true){
+    console.log("Reached / at: "+serverTime());
+  }
   newArray = [],
   rawArray = [],
   filteredData = [],
@@ -84,8 +89,10 @@ router.get("/", (req, res) =>{
 })
 
 router.post("/upload",(req, res) =>{
-  console.log("Upload started at: "+serverTime());
-  console.log(checkSize(req.files.datafile.size));
+  if(debug_mode === true){
+    console.log("Upload started at: "+serverTime());
+    console.log(checkSize(req.files.datafile.size));
+  }
   rawArray = [];
   let info = req.files.datafile.tempFilePath
   let i = 1;
@@ -121,6 +128,9 @@ router.post("/upload",(req, res) =>{
   })
   .on('end', () =>{
     if(done === true){
+      if(debug_mode === true){
+        console.log("Redirecting to data at: "+serverTime());
+      }
       res.redirect('/data/page1');
     }
     if(done === false){
@@ -131,7 +141,9 @@ router.post("/upload",(req, res) =>{
 });
 
 router.get('/data/page:number', (req, res) =>{
-
+  if(debug_mode === true){
+    console.log("Reached data at: "+serverTime());
+  }
   type = [];
   comp = [];
   lev = [];
@@ -214,7 +226,20 @@ router.get('/data/page:number', (req, res) =>{
       return newArray, type, comp, hrs, mins, lev
     }
     returning();
+  } else {
+    newArray.forEach((value) =>{
+      if (type.indexOf(value.type)==-1) type.push(value.type);
+      if (comp.indexOf(value.component)==-1) comp.push(value.component);
+      if (lev.indexOf(value.level)==-1) lev.push(value.level);
+      if (hrs.indexOf(value.time.slice(11,13))==-1) hrs.push(value.time.slice(11,13));
+      if (mins.indexOf(value.time.slice(14,16))==-1) mins.push(value.time.slice(14,16));
+    });
+    const returningNew = () =>{
+      return newArray, type, comp, hrs, mins, lev
+    }
+    returningNew
   }
+
 
   const directory = './tmp'
   if (!fs.existsSync(directory)){
@@ -397,6 +422,19 @@ router.get('/filter/page:number', function(req, res){
   let currentPage = page;
   const numberPerPage = 500;
   let numberOfPages = 1;
+
+  newArray.forEach((value) =>{
+    if (type.indexOf(value.type)==-1) type.push(value.type);
+    if (comp.indexOf(value.component)==-1) comp.push(value.component);
+    if (lev.indexOf(value.level)==-1) lev.push(value.level);
+    if (hrs.indexOf(value.time.slice(11,13))==-1) hrs.push(value.time.slice(11,13));
+    if (mins.indexOf(value.time.slice(14,16))==-1) mins.push(value.time.slice(14,16));
+  });
+  const returningNew = () =>{
+    return newArray, type, comp, hrs, mins, lev
+  }
+  returningNew
+
   load();
   function load(){
     makeList()
@@ -418,6 +456,8 @@ router.get('/filter/page:number', function(req, res){
       var begin = ((currentPage - 1) * numberPerPage);
       var end = begin + numberPerPage;
       pageList = filteredData.slice(begin, end);
+
+      console.log( type.length+"/"+ comp.length+"/"+ hrs.length+"/"+ mins.length+"/"+ lev.length);
       res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort(), rows:filteredData.length});
     }
   }
@@ -537,6 +577,19 @@ router.get('/custom/page:number', function(req,res){
   let currentPage = page;
   const numberPerPage = 500;
   let numberOfPages = 1;
+
+  newArray.forEach((value) =>{
+    if (type.indexOf(value.type)==-1) type.push(value.type);
+    if (comp.indexOf(value.component)==-1) comp.push(value.component);
+    if (lev.indexOf(value.level)==-1) lev.push(value.level);
+    if (hrs.indexOf(value.time.slice(11,13))==-1) hrs.push(value.time.slice(11,13));
+    if (mins.indexOf(value.time.slice(14,16))==-1) mins.push(value.time.slice(14,16));
+  });
+  const returningNew = () =>{
+    return newArray, type, comp, hrs, mins, lev
+  }
+  returningNew
+
   load();
   function load(){
     makeList()
@@ -560,6 +613,7 @@ router.get('/custom/page:number', function(req,res){
       var begin = ((currentPage - 1) * numberPerPage);
       var end = begin + numberPerPage;
       pageList = customData.slice(begin, end);
+      console.log( type.length+"/"+ comp.length+"/"+ hrs.length+"/"+ mins.length+"/"+ lev);
       res.render('pages/filter',{data:JSON.stringify(pageList), current:currentPage, total: numberOfPages, type:type.sort(), comp:comp.sort(), hrs:hrs.sort(), mins:mins.sort(), lev:lev.sort(), rows:customData.length});
     }
   }
