@@ -15,11 +15,15 @@
         <div class="collapse boxing" id="collapseExample">
           <div class="card card-body card-space">
           <% if(type){ %>
-            <ul class="boxing">
-            <% for(let i = 0; i < type.length; i++){ %>
-              <input type="checkbox" name="type" value="<%= type[i] %>"><label for="<%= type[i] %>"><%= type[i] %></label><br>
-            <% } %>
-            </ul>
+            <div class="container">
+              <% for(let i = 0; i < type.length; i++){ %>
+                <div class="row">
+                  <div class="">
+                    <input type="checkbox" name="type" value="<%= type[i] %>"><label for="<%= type[i] %>"><%= type[i] %></label>
+                  </div>
+                </div>
+              <% } %>
+            </div>
           <% } %>
           </div>
         </div><br>
@@ -29,11 +33,15 @@
         <div class="collapse" id="collapseExample2">
           <div class="card card-body card-space">
           <% if(comp){ %>
-            <ul class="boxing">
-            <% for(let i = 0; i < comp.length; i++){ %>
-              <input type="checkbox" name="comp" value="<%= comp[i] %>"><label for="<%= comp[i] %>"><%= comp[i] %></label><br>
-            <% } %>
-            </ul>
+            <div class="container">
+              <% for(let i = 0; i < comp.length; i++){ %>
+                <div class="row">
+                  <div class="">
+                    <input type="checkbox" name="comp" value="<%= comp[i] %>"><label for="<%= comp[i] %>"><%= comp[i] %></label>
+                  </div>
+                </div>
+              <% } %>
+            </div>
           <% } %>
           </div>
         </div><br>
@@ -43,11 +51,15 @@
         <div class="collapse" id="collapseExample5">
           <div class="card card-body card-space boxing">
           <% if(lev){ %>
-            <ul class="boxing">
-            <% for(let i = 0; i < lev.length; i++){ %>
-              <input type="checkbox" name="lev" value="<%= lev[i] %>"><label for="<%= lev[i] %>"><% if(lev[i]==50){ %><%= lev[i]+" Errors" %><% }else{ %><%= lev[i] %><% } %></label><br>
-            <% } %>
-            </ul>
+            <div class="container">
+              <div class="row">
+              <% for(let i = 0; i < lev.length; i++){ %>
+                  <div class="col-3">
+                    <input type="checkbox" name="lev" value="<%= lev[i] %>"><label for="<%= lev[i] %>"><%= lev[i] %></label><br>
+                  </div>
+                <% } %>
+              </div>
+            </div>
           <% } %>
           </div>
         </div><br>
@@ -57,11 +69,15 @@
         <div class="collapse" id="collapseExample3">
           <div class="card card-body card-space boxing">
           <% if(hrs){ %>
-            <ul class="boxing">
-            <% for(let i = 0; i < hrs.length; i++){ %>
-              <input type="checkbox" name="hrs" value="<%= hrs[i] %>"><label for="<%= hrs[i] %>"><%= hrs[i]+"H" %></label> |
-            <% } %>
-            </ul>
+            <div class="container">
+              <div class="row">
+                <% for(let i = 0; i < hrs.length; i++){ %>
+                  <div class="col-3">
+                    <input type="checkbox" name="hrs" value="<%= hrs[i] %>"><label for="<%= hrs[i] %>"><%= hrs[i] %></label>
+                  </div>
+                <% } %>
+              </div>
+            </div>
           <% } %>
           </div>
         </div><br>
@@ -71,19 +87,22 @@
         <div class="collapse" id="collapseExample4">
           <div class="card card-body card-space">
           <% if(mins){ %>
-            <ul class="boxing">
-            <% for(let i = 0; i < mins.length; i++){ %>
-              <input type="checkbox" name="mins" value="<%= mins[i] %>"><label for="<%= mins[i] %>"><%= mins[i]+"M" %></label> |
-            <% } %>
-            </ul>
+            <div class="container">
+              <div class="row">
+                <% for(let i = 0; i < mins.length; i++){ %>
+                  <div class="col-3">
+                    <input type="checkbox" name="mins" value="<%= mins[i] %>"><label for="<%= mins[i] %>"><%= mins[i] %></label>
+                  </div>
+                <% } %>
+              </div>
+            </div>
           <% } %>
           </div>
         </div><br>
         <button type="button" name="button" onclick="createFilter()">Apply Filters</button>
       </div>
-
     </div>
-    <div id="list" class="col-16 col-md-9 col-xl-12 py-md-3 pl-md-5" role="main"></div>
+    <main id="list" class="col-16 col-md-9 col-xl-12 py-md-3 pl-md-5" role="main"></main>
   </div>
   <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -167,7 +186,7 @@
       document.getElementById("current").innerHTML = "Page: <%= current %> / <%= total %>";
       document.getElementById("current").classList.add("navbar-nav","mr-auto");
       // get the reference for the body
-      var body = document.getElementsByTagName('div')[15];
+      var body = document.getElementsByTagName('main')[0];
       // creates a <table> element and a <tbody> element
       var tbl = document.getElementsByTagName("table")[0];
       var tblBody = document.getElementsByTagName("tbody")[0];

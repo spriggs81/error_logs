@@ -31,7 +31,6 @@ body{
 .card-space{
   width: 100%;
   padding: 0;
-  border: 2px #ff8585 solid;
   background-color: inherit;
   color: #99f0a3;
 }
@@ -78,4 +77,8 @@ div.filterMenu a{
 div.filterMenu{
   position: fixed;
   max-width: inherit;
+}
+
+.col-3, .col {
+  max-width: fit-content;
 }
