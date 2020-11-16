@@ -11,10 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "ejs": "^2.6.2",
+    "ejs": "^2.7.4",
     "event-stream": "^4.0.1",
     "express": "^4.17.1",
-    "express-fileupload": "^1.1.6-alpha.5",
+    "express-fileupload": "^1.2.0",
     "fs": "0.0.1-security",
     "sql-formatter": "^2.3.3"
   }
