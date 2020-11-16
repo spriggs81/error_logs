@@ -6,81 +6,103 @@
     <input type="button" id="previous" onclick="previousPage()" value="Previous" class="btn btn-dark" />
     <input type="button" id="last" onclick="lastPage()" value="Last" class="btn btn-dark" />
   </div>
-  <div class="row flex-xl-nowrap">
+  <div id="dataPlace" class="row flex-xl-nowrap">
     <div class="col-12 col-md-3 col-lg-2 bd-sidebar collapse" id="collapseExample1">
-      <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-        Types:
-      </a>
-      <div class="collapse boxing" id="collapseExample">
-        <div class="card card-body card-space">
-        <% if(type){ %>
-          <ul class="boxing boxing">
-          <% for(let i = 0; i < type.length; i++){ %>
-            <input type="checkbox" name="type" value="<%= type[i] %>"><label for="<%= type[i] %>"><%= type[i] %></label><br>
+      <div class="filterMenu">
+        <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+          Types:
+        </a>
+        <div class="collapse boxing" id="collapseExample">
+          <div class="card card-body card-space">
+          <% if(type){ %>
+            <div class="container">
+              <% for(let i = 0; i < type.length; i++){ %>
+                <div class="row">
+                  <div class="">
+                    <input type="checkbox" name="type" value="<%= type[i] %>"><label for="<%= type[i] %>"><%= type[i] %></label>
+                  </div>
+                </div>
+              <% } %>
+            </div>
           <% } %>
-          </ul>
-        <% } %>
-        </div>
-      </div><br>
-      <a data-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample2">
-        Components:
-      </a>
-      <div class="collapse" id="collapseExample2">
-        <div class="card card-body card-space">
-        <% if(comp){ %>
-          <ul class="boxing">
-          <% for(let i = 0; i < comp.length; i++){ %>
-            <input type="checkbox" name="comp" value="<%= comp[i] %>"><label for="<%= comp[i] %>"><%= comp[i] %></label><br>
+          </div>
+        </div><br>
+        <a data-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample2">
+          Components:
+        </a>
+        <div class="collapse" id="collapseExample2">
+          <div class="card card-body card-space">
+          <% if(comp){ %>
+            <div class="container">
+              <% for(let i = 0; i < comp.length; i++){ %>
+                <div class="row">
+                  <div class="">
+                    <input type="checkbox" name="comp" value="<%= comp[i] %>"><label for="<%= comp[i] %>"><%= comp[i] %></label>
+                  </div>
+                </div>
+              <% } %>
+            </div>
           <% } %>
-          </ul>
-        <% } %>
-        </div>
-      </div><br>
-      <a data-toggle="collapse" href="#collapseExample5" role="button" aria-expanded="false" aria-controls="collapseExample5">
-        Levels:
-      </a>
-      <div class="collapse" id="collapseExample5">
-        <div class="card card-body card-space boxing">
-        <% if(lev){ %>
-          <ul class="boxing">
-          <% for(let i = 0; i < lev.length; i++){ %>
-            <input type="checkbox" name="lev" value="<%= lev[i] %>"><label for="<%= lev[i] %>"><% if(lev[i]==50){ %><%= lev[i]+" Errors" %><% }else{ %><%= lev[i] %><% } %></label><br>
+          </div>
+        </div><br>
+        <a data-toggle="collapse" href="#collapseExample5" role="button" aria-expanded="false" aria-controls="collapseExample5">
+          Levels:
+        </a>
+        <div class="collapse" id="collapseExample5">
+          <div class="card card-body card-space boxing">
+          <% if(lev){ %>
+            <div class="container">
+              <div class="row">
+              <% for(let i = 0; i < lev.length; i++){ %>
+                  <div class="col-3">
+                    <input type="checkbox" name="lev" value="<%= lev[i] %>"><label for="<%= lev[i] %>"><%= lev[i] %></label><br>
+                  </div>
+                <% } %>
+              </div>
+            </div>
           <% } %>
-          </ul>
-        <% } %>
-        </div>
-      </div><br>
-      <a data-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample3">
-        Hours:
-      </a>
-      <div class="collapse" id="collapseExample3">
-        <div class="card card-body card-space boxing">
-        <% if(hrs){ %>
-          <ul class="boxing">
-          <% for(let i = 0; i < hrs.length; i++){ %>
-            <input type="checkbox" name="hrs" value="<%= hrs[i] %>"><label for="<%= hrs[i] %>"><%= hrs[i]+"H" %></label> |
+          </div>
+        </div><br>
+        <a data-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample3">
+          Hours:
+        </a>
+        <div class="collapse" id="collapseExample3">
+          <div class="card card-body card-space boxing">
+          <% if(hrs){ %>
+            <div class="container">
+              <div class="row">
+                <% for(let i = 0; i < hrs.length; i++){ %>
+                  <div class="col-3">
+                    <input type="checkbox" name="hrs" value="<%= hrs[i] %>"><label for="<%= hrs[i] %>"><%= hrs[i] %></label>
+                  </div>
+                <% } %>
+              </div>
+            </div>
           <% } %>
-          </ul>
-        <% } %>
-        </div>
-      </div><br>
-      <a data-toggle="collapse" href="#collapseExample4" role="button" aria-expanded="false" aria-controls="collapseExample4">
-        Minutes:
-      </a>
-      <div class="collapse" id="collapseExample4">
-        <div class="card card-body card-space">
-        <% if(mins){ %>
-          <ul class="boxing">
-          <% for(let i = 0; i < mins.length; i++){ %>
-            <input type="checkbox" name="mins" value="<%= mins[i] %>"><label for="<%= mins[i] %>"><%= mins[i]+"M" %></label> |
+          </div>
+        </div><br>
+        <a data-toggle="collapse" href="#collapseExample4" role="button" aria-expanded="false" aria-controls="collapseExample4">
+          Minutes:
+        </a>
+        <div class="collapse" id="collapseExample4">
+          <div class="card card-body card-space">
+          <% if(mins){ %>
+            <div class="container">
+              <div class="row">
+                <% for(let i = 0; i < mins.length; i++){ %>
+                  <div class="col-3">
+                    <input type="checkbox" name="mins" value="<%= mins[i] %>"><label for="<%= mins[i] %>"><%= mins[i] %></label>
+                  </div>
+                <% } %>
+              </div>
+            </div>
           <% } %>
-          </ul>
-        <% } %>
-        </div>
-      </div><br>
-      <button type="button" name="button" onclick="createFilter()">Apply Filters</button>
+          </div>
+        </div><br>
+        <button type="button" name="button" onclick="createFilter()">Apply Filters</button>
+      </div>
     </div>
-    <div id="list" class="col-16 col-md-9 col-xl-12 py-md-3 pl-md-5" role="main"></div>
+    <main id="list" class="col-16 col-md-9 col-xl-12 py-md-3 pl-md-5" role="main"></main>
   </div>
   <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -106,6 +128,23 @@
     </div>
   </div>
   <script type="text/javascript">
+    const openInfo = (y,x)=>{
+      let info = document.getElementById('info'+y+x);
+      let changeThis = info.innerHTML;
+      let middle = changeThis.slice(5,changeThis.length);
+      console.log(middle);
+      let subInfo = document.getElementById('subInfo'+middle+x);
+      console.log(subInfo);
+      if(subInfo.classList.contains('bye')){
+        subInfo.classList.remove('bye');
+        const hide = changeThis.replace('Show', 'Hide');
+        info.innerHTML = hide;
+      } else {
+        subInfo.classList.add('bye');
+        const show = changeThis.replace('Hide', 'Show');
+        info.innerHTML = show;
+      }
+    }
     let list = <%-data %>;
     let pageList = list;
     let currentPage = <%= current %>;
@@ -138,6 +177,7 @@
       const head = '<table class="table table-striped table-dark"><thead><tr><th>#</th><th>Time:</th><th>Name:</th><th>Type:</th><th>Component:</th><th>Level:</th><th>Message: </th></tr></div></thead><tbody>';
       nav = document.getElementById("navPlace");
       nav1 = document.getElementById("navPlace1");
+      document.getElementById("totalRows").innerHTML = "Total Rows: <%= rows %>"
       document.getElementById("current").innerHTML = "";
       document.getElementById("list").innerHTML = "";
       nav.innerHTML = "";
@@ -146,8 +186,7 @@
       document.getElementById("current").innerHTML = "Page: <%= current %> / <%= total %>";
       document.getElementById("current").classList.add("navbar-nav","mr-auto");
       // get the reference for the body
-      var body = document.getElementsByTagName('div')[14];
-      console.log(body);
+      var body = document.getElementsByTagName('main')[0];
       // creates a <table> element and a <tbody> element
       var tbl = document.getElementsByTagName("table")[0];
       var tblBody = document.getElementsByTagName("tbody")[0];
@@ -196,41 +235,106 @@
         cell6.appendChild(cellText6);
         row0.appendChild(cell6);
         if(obj.payload){
-          var cell7 = document.createElement("td");
-          var cellText7 = document.createTextNode(obj.newPayload);
-          cell7.appendChild(cellText7);
+          let cell7 = document.createElement("td");
+          let cellText7 = document.createTextNode("Show Payload");
+          let subCellText7 = document.createTextNode(obj.newPayload);
+          let span7 = document.createElement("a");
+          let subSpan7 = document.createElement("span");
+          let br7 = document.createElement("br");
+          subSpan7.appendChild(subCellText7);
+          subSpan7.setAttribute("id","subInfoPayload"+obj.place);
+          subSpan7.classList.add("bye")
+          span7.appendChild(cellText7);
+          span7.setAttribute("id","infoP"+obj.place);
+          span7.classList.add("option")
+          span7.setAttribute("onClick","openInfo('P',"+obj.place+")");
+          cell7.appendChild(span7);
+          cell7.appendChild(br7);
+          cell7.appendChild(subSpan7);
           cell7.setAttribute("colspan", "8");
           row1.appendChild(cell7)
           r1 = 1
         }
         if(obj.message){
-          var cell8 = document.createElement("td");
-          var cellText8 = document.createTextNode(obj.newMsg);
-          cell8.appendChild(cellText8);
+          let cell8 = document.createElement("td");
+          let cellText8 = document.createTextNode("Show Message");
+          let subCellText8 = document.createTextNode(obj.newMsg);
+          let span8 = document.createElement("a");
+          let subSpan8 = document.createElement("span");
+          let br8 = document.createElement("br");
+          subSpan8.appendChild(subCellText8);
+          subSpan8.setAttribute("id","subInfoMessage"+obj.place);
+          subSpan8.classList.add("bye")
+          span8.appendChild(cellText8);
+          span8.setAttribute("id","infoM"+obj.place);
+          span8.classList.add("option")
+          span8.setAttribute("onClick","openInfo('M',"+obj.place+")");
+          cell8.appendChild(span8);
+          cell8.appendChild(br8);
+          cell8.appendChild(subSpan8);
           cell8.setAttribute("colspan", "8");
           row2.appendChild(cell8)
           r2 = 1
         }
         if(obj.result){
-          var cell9 = document.createElement("td");
-          var cellText9 = document.createTextNode(obj.newResult);
-          cell9.appendChild(cellText9);
+          let cell9 = document.createElement("td");
+          let cellText9 = document.createTextNode("Show Results");
+          let subCellText9 = document.createTextNode(obj.newResult);
+          let span9 = document.createElement("a");
+          let subSpan9 = document.createElement("span");
+          let br9 = document.createElement("br");
+          subSpan9.appendChild(subCellText9);
+          subSpan9.setAttribute("id","subInfoResults"+obj.place);
+          subSpan9.classList.add("bye")
+          span9.appendChild(cellText9);
+          span9.setAttribute("id","infoR"+obj.place);
+          span9.classList.add("option")
+          span9.setAttribute("onClick","openInfo('R',"+obj.place+")");
+          cell9.appendChild(span9);
+          cell9.appendChild(br9);
+          cell9.appendChild(subSpan9);
           cell9.setAttribute("colspan", "8");
           row3.appendChild(cell9)
           r3 = 1
         }
         if(obj.newSql){
-          var cell10 = document.createElement("td");
-          var cellText10 = document.createTextNode("SQL Query: "+obj.newSql);
-          cell10.appendChild(cellText10);
+          let cell10 = document.createElement("td");
+          let cellText10 = document.createTextNode("Show Query");
+          let subCellText10 = document.createTextNode(obj.newSql);
+          let span10 = document.createElement("a");
+          let subSpan10 = document.createElement("span");
+          let br10 = document.createElement("br");
+          subSpan10.appendChild(subCellText10);
+          subSpan10.setAttribute("id","subInfoQuery"+obj.place);
+          subSpan10.classList.add("bye")
+          span10.appendChild(cellText10);
+          span10.setAttribute("id","infoQ"+obj.place);
+          span10.classList.add("option")
+          span10.setAttribute("onClick","openInfo('Q',"+obj.place+")");
+          cell10.appendChild(span10);
+          cell10.appendChild(br10);
+          cell10.appendChild(subSpan10);
           cell10.setAttribute("colspan", "8");
-          row4.appendChild(cell10)
+          row4.appendChild(cell10);
           r4 = 1
         }
         if(obj.newErr){
-          var cell11 = document.createElement("td");
-          var cellText11 = document.createTextNode(obj.newErr);
-          cell11.appendChild(cellText11);
+          let cell11 = document.createElement("td");
+          let cellText11 = document.createTextNode("Show Error");
+          let subCellText11 = document.createTextNode(obj.newErr);
+          let span11 = document.createElement("a");
+          let subSpan11 = document.createElement("span");
+          let br11 = document.createElement("br");
+          subSpan11.appendChild(subCellText11);
+          subSpan11.setAttribute("id","subInfoError"+obj.place);
+          subSpan11.classList.add("bye")
+          span11.appendChild(cellText11);
+          span11.setAttribute("id","infoE"+obj.place);
+          span11.classList.add("option")
+          span11.setAttribute("onClick","openInfo('E',"+obj.place+")");
+          cell11.appendChild(span11);
+          cell11.appendChild(br11);
+          cell11.appendChild(subSpan11);
           cell11.setAttribute("colspan", "8");
           row5.appendChild(cell11)
           r5 = 1
@@ -335,7 +439,6 @@
           filterForm.appendChild(mip);
         }
       }
-      console.log(filterForm);
       document.body.append(filterForm)
       filterForm.submit()
     }
@@ -346,6 +449,7 @@
       x.appendChild(d);
       x.submit();
     }
+
   </script>
 
 <% include ../partials/footer %>
